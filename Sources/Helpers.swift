@@ -1,4 +1,8 @@
-public func debugDescription(any: Any) -> String {
+public func prettyPrint(any: Any) {
+    print(prettyDescription(any), terminator: "\n\n")
+}
+
+public func prettyDescription(any: Any) -> String {
     guard let any = deepUnwrap(any) else {
 		return "nil"
 	}
@@ -44,9 +48,9 @@ public func debugDescription(any: Any) -> String {
         
         for (index, property) in properties.enumerate() {
             if property.label!.characters.first! == "." {
-                string += debugDescription(property.value)
+                string += prettyDescription(property.value)
             } else {
-                string += "\(property.label!): \(debugDescription(property.value))"
+                string += "\(property.label!): \(prettyDescription(property.value))"
             }
             
             string += (index < properties.count - 1 ? ", " : "")
@@ -59,7 +63,7 @@ public func debugDescription(any: Any) -> String {
         var string = "["
     
         for (index, property) in properties.enumerate() {
-            string += indentedString(debugDescription(property.value) + (index < properties.count - 1 ? ",\r" : ""))
+            string += indentedString(prettyDescription(property.value) + (index < properties.count - 1 ? ",\r" : ""))
         }
         
         return string + "\r]"
@@ -71,7 +75,7 @@ public func debugDescription(any: Any) -> String {
         for (index, property) in properties.enumerate() {
             let pair = Array(Mirror(reflecting: property.value).children)
             
-            string += indentedString("\(debugDescription(pair[0].value)): \(debugDescription(pair[1].value))" + (index < properties.count - 1 ? ",\r" : ""))
+            string += indentedString("\(prettyDescription(pair[0].value)): \(prettyDescription(pair[1].value))" + (index < properties.count - 1 ? ",\r" : ""))
         }
         
         return string + "\r]"
@@ -84,7 +88,7 @@ public func debugDescription(any: Any) -> String {
         
         var string = "\(mirror.subjectType).\(properties.first!.label!)"
         
-        let associatedValueString = debugDescription(properties.first!.value)
+        let associatedValueString = prettyDescription(properties.first!.value)
         
         if associatedValueString.characters.first! == "(" {
             string += associatedValueString
@@ -103,7 +107,7 @@ public func debugDescription(any: Any) -> String {
         var string = "\(typeName){"
         
         for (index, property) in properties.enumerate() {
-            string += indentedString("\(property.label!): \(debugDescription(property.value))" + (index < properties.count - 1 ? ",\r" : ""))
+            string += indentedString("\(property.label!): \(prettyDescription(property.value))" + (index < properties.count - 1 ? ",\r" : ""))
         }
         
         return string + "\r}"

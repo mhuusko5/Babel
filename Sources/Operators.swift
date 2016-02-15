@@ -4,19 +4,21 @@ infix operator =>?? { associativity left precedence 150 }
 
 // MARK - Array
 
+// TODO: Operators should have own error type, that allows for nested errors, but adding key
+
 public func =>(lhs: Value, rhs: Int) throws -> Value {
     return try lhs.valueAt(rhs)
 }
 
 public func =><T: Decodable>(lhs: Value, rhs: Int) throws -> T {
-    return try (lhs => rhs).decodeValue()
+    return try (lhs => rhs).decode()
 }
 
 public func =><T: Decodable>(lhs: Value, rhs: Int) throws -> [T] {
     return try (lhs => rhs).decodeArray()
 }
 
-public func =><T: Decodable>(lhs: Value, rhs: Int) throws -> [String: T] {
+public func =><K: Decodable, V: Decodable>(lhs: Value, rhs: Int) throws -> [K: V] {
     return try (lhs => rhs).decodeDictionary()
 }
 
@@ -25,14 +27,14 @@ public func =>(lhs: Value?, @autoclosure rhs: () -> Int) throws -> Value? {
 }
 
 public func =><T: Decodable>(lhs: Value?, @autoclosure rhs: () -> Int) throws -> T? {
-    return try (lhs => rhs)?.decodeValue()
+    return try (lhs => rhs)?.decode()
 }
 
 public func =><T: Decodable>(lhs: Value?, @autoclosure rhs: () -> Int) throws -> [T]? {
     return try (lhs => rhs)?.decodeArray()
 }
 
-public func =><T: Decodable>(lhs: Value?, @autoclosure rhs: () -> Int) throws -> [String: T]? {
+public func =><K: Decodable, V: Decodable>(lhs: Value?, @autoclosure rhs: () -> Int) throws -> [K: V]? {
     return try (lhs => rhs)?.decodeDictionary()
 }
 
@@ -43,14 +45,14 @@ public func =>?(lhs: Value, rhs: Int) throws -> Value? {
 }
 
 public func =>?<T: Decodable>(lhs: Value, rhs: Int) throws -> T? {
-    return try (lhs =>? rhs)?.decodeValue()
+    return try (lhs =>? rhs)?.decode()
 }
 
 public func =>?<T: Decodable>(lhs: Value, rhs: Int) throws -> [T]? {
     return try (lhs =>? rhs)?.decodeArray()
 }
 
-public func =>?<T: Decodable>(lhs: Value, rhs: Int) throws -> [String: T]? {
+public func =>?<K: Decodable, V: Decodable>(lhs: Value, rhs: Int) throws -> [K: V]? {
     return try (lhs =>? rhs)?.decodeDictionary()
 }
 
@@ -59,14 +61,14 @@ public func =>?(lhs: Value?, @autoclosure rhs: () -> Int) throws -> Value? {
 }
 
 public func =>?<T: Decodable>(lhs: Value?, @autoclosure rhs: () -> Int) throws -> T? {
-    return try (lhs =>? rhs)?.decodeValue()
+    return try (lhs =>? rhs)?.decode()
 }
 
 public func =>?<T: Decodable>(lhs: Value?, @autoclosure rhs: () -> Int) throws -> [T]? {
     return try (lhs =>? rhs)?.decodeArray()
 }
 
-public func =>?<T: Decodable>(lhs: Value?, @autoclosure rhs: () -> Int) throws -> [String: T]? {
+public func =>?<K: Decodable, V: Decodable>(lhs: Value?, @autoclosure rhs: () -> Int) throws -> [K: V]? {
     return try (lhs =>? rhs)?.decodeDictionary()
 }
 
@@ -77,14 +79,14 @@ public func =>??(lhs: Value, rhs: Int) throws -> Value? {
 }
 
 public func =>??<T: Decodable>(lhs: Value, rhs: Int) throws -> T? {
-    return try (lhs =>?? rhs)?.decodeValue()
+    return try (lhs =>?? rhs)?.decode()
 }
 
 public func =>??<T: Decodable>(lhs: Value, rhs: Int) throws -> [T]? {
     return try (lhs =>?? rhs)?.decodeArray()
 }
 
-public func =>??<T: Decodable>(lhs: Value, rhs: Int) throws -> [String: T]? {
+public func =>??<K: Decodable, V: Decodable>(lhs: Value, rhs: Int) throws -> [K: V]? {
     return try (lhs =>?? rhs)?.decodeDictionary()
 }
 
@@ -93,14 +95,14 @@ public func =>??(lhs: Value?, @autoclosure rhs: () -> Int) throws -> Value? {
 }
 
 public func =>??<T: Decodable>(lhs: Value?, @autoclosure rhs: () -> Int) throws -> T? {
-    return try (lhs =>?? rhs)?.decodeValue()
+    return try (lhs =>?? rhs)?.decode()
 }
 
 public func =>??<T: Decodable>(lhs: Value?, @autoclosure rhs: () -> Int) throws -> [T]? {
     return try (lhs =>?? rhs)?.decodeArray()
 }
 
-public func =>??<T: Decodable>(lhs: Value?, @autoclosure rhs: () -> Int) throws -> [String: T]? {
+public func =>??<K: Decodable, V: Decodable>(lhs: Value?, @autoclosure rhs: () -> Int) throws -> [K: V]? {
     return try (lhs =>?? rhs)?.decodeDictionary()
 }
 
@@ -111,14 +113,14 @@ public func =>(lhs: Value, rhs: String) throws -> Value {
 }
 
 public func =><T: Decodable>(lhs: Value, rhs: String) throws -> T {
-    return try (lhs => rhs).decodeValue()
+    return try (lhs => rhs).decode()
 }
 
 public func =><T: Decodable>(lhs: Value, rhs: String) throws -> [T] {
     return try (lhs => rhs).decodeArray()
 }
 
-public func =><T: Decodable>(lhs: Value, rhs: String) throws -> [String: T] {
+public func =><K: Decodable, V: Decodable>(lhs: Value, rhs: String) throws -> [K: V] {
     return try (lhs => rhs).decodeDictionary()
 }
 
@@ -127,14 +129,14 @@ public func =>(lhs: Value?, @autoclosure rhs: () -> String) throws -> Value? {
 }
 
 public func =><T: Decodable>(lhs: Value?, @autoclosure rhs: () -> String) throws -> T? {
-    return try (lhs => rhs)?.decodeValue()
+    return try (lhs => rhs)?.decode()
 }
 
 public func =><T: Decodable>(lhs: Value?, @autoclosure rhs: () -> String) throws -> [T]? {
     return try (lhs => rhs)?.decodeArray()
 }
 
-public func =><T: Decodable>(lhs: Value?, @autoclosure rhs: () -> String) throws -> [String: T]? {
+public func =><K: Decodable, V: Decodable>(lhs: Value?, @autoclosure rhs: () -> String) throws -> [K: V]? {
     return try (lhs => rhs)?.decodeDictionary()
 }
 
@@ -145,14 +147,14 @@ public func =>?(lhs: Value, rhs: String) throws -> Value? {
 }
 
 public func =>?<T: Decodable>(lhs: Value, rhs: String) throws -> T? {
-    return try (lhs =>? rhs)?.decodeValue()
+    return try (lhs =>? rhs)?.decode()
 }
 
 public func =>?<T: Decodable>(lhs: Value, rhs: String) throws -> [T]? {
     return try (lhs =>? rhs)?.decodeArray()
 }
 
-public func =>?<T: Decodable>(lhs: Value, rhs: String) throws -> [String: T]? {
+public func =>?<K: Decodable, V: Decodable>(lhs: Value, rhs: String) throws -> [K: V]? {
     return try (lhs =>? rhs)?.decodeDictionary()
 }
 
@@ -161,14 +163,14 @@ public func =>?(lhs: Value?, @autoclosure rhs: () -> String) throws -> Value? {
 }
 
 public func =>?<T: Decodable>(lhs: Value?, @autoclosure rhs: () -> String) throws -> T? {
-    return try (lhs =>? rhs)?.decodeValue()
+    return try (lhs =>? rhs)?.decode()
 }
 
 public func =>?<T: Decodable>(lhs: Value?, @autoclosure rhs: () -> String) throws -> [T]? {
     return try (lhs =>? rhs)?.decodeArray()
 }
 
-public func =>?<T: Decodable>(lhs: Value?, @autoclosure rhs: () -> String) throws -> [String: T]? {
+public func =>?<K: Decodable, V: Decodable>(lhs: Value?, @autoclosure rhs: () -> String) throws -> [K: V]? {
     return try (lhs =>? rhs)?.decodeDictionary()
 }
 
@@ -179,14 +181,14 @@ public func =>??(lhs: Value, rhs: String) throws -> Value? {
 }
 
 public func =>??<T: Decodable>(lhs: Value, rhs: String) throws -> T? {
-    return try (lhs =>?? rhs)?.decodeValue()
+    return try (lhs =>?? rhs)?.decode()
 }
 
 public func =>??<T: Decodable>(lhs: Value, rhs: String) throws -> [T]? {
     return try (lhs =>?? rhs)?.decodeArray()
 }
 
-public func =>??<T: Decodable>(lhs: Value, rhs: String) throws -> [String: T]? {
+public func =>??<K: Decodable, V: Decodable>(lhs: Value, rhs: String) throws -> [K: V]? {
     return try (lhs =>?? rhs)?.decodeDictionary()
 }
 
@@ -195,13 +197,13 @@ public func =>??(lhs: Value?, @autoclosure rhs: () -> String) throws -> Value? {
 }
 
 public func =>??<T: Decodable>(lhs: Value?, @autoclosure rhs: () -> String) throws -> T? {
-    return try (lhs =>?? rhs)?.decodeValue()
+    return try (lhs =>?? rhs)?.decode()
 }
 
 public func =>??<T: Decodable>(lhs: Value?, @autoclosure rhs: () -> String) throws -> [T]? {
     return try (lhs =>?? rhs)?.decodeArray()
 }
 
-public func =>??<T: Decodable>(lhs: Value?, @autoclosure rhs: () -> String) throws -> [String: T]? {
+public func =>??<K: Decodable, V: Decodable>(lhs: Value?, @autoclosure rhs: () -> String) throws -> [K: V]? {
     return try (lhs =>?? rhs)?.decodeDictionary()
 }

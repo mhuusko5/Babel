@@ -163,7 +163,7 @@ extension Value: ArrayLiteralConvertible {
 }
 
 extension Value: DictionaryLiteralConvertible {
-    public init(dictionaryLiteral elements: (StringLiteralType, Babel.Value)...) {
+    public init(dictionaryLiteral elements: (StringLiteralType, Value)...) {
         var dictionary = [StringLiteralType: Value](minimumCapacity: elements.count)
 
         for (key, value) in elements { dictionary[key] = value }

@@ -2,9 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:Babel.playground">
+      location = "container:Babel.xcodeproj">
    </FileRef>
    <FileRef
-      location = "container:Babel.xcodeproj">
+      location = "group:Babel.playground">
    </FileRef>
 </Workspace>

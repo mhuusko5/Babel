@@ -4,47 +4,63 @@ public enum DecodingError: ErrorType {
     case TypeMismatch(expectedType: Any.Type, value: Value)
 }
 
-public extension Value {
+public extension _ArrayType where Generator.Element == Value {
     func valueAt(index: Int) throws -> Value {
-        let array = try asArray()
+        guard index < count else { throw DecodingError.OutOfBounds(index: index, array: Array(self)) }
         
-        guard index < array.count else { throw DecodingError.OutOfBounds(index: index, array: array) }
-        
-        return array[index]
+        return self[index]
     }
     
     func maybeValueAt(index: Int, nilOnNull: Bool = true, throwOnMissing: Bool = true) throws -> Value? {
-        let array = try asArray()
-    
-        guard index < array.count else {
-            if throwOnMissing { throw DecodingError.OutOfBounds(index: index, array: array) }
+        guard index < count else {
+            if throwOnMissing { throw DecodingError.OutOfBounds(index: index, array: Array(self)) }
             else { return nil }
         }
         
-        let value = array[index]
+        let value = self[index]
         
-        if nilOnNull, case .Null = value { return nil }
+        if nilOnNull && value == .Null { return nil }
         else { return value }
     }
-    
-    func valueFor(key: Swift.String) throws -> Value {
-        let dictionary = try asDictionary()
+}
+
+public extension CollectionType where Generator.Element == (String, Value) {
+    func valueFor(key: String) throws -> Value {
+        let `self` = self as! [String: Value]
         
-        guard let value = dictionary[key] else { throw DecodingError.MissingKey(key: key, dictionary: dictionary) }
+        guard let value = self[key] else { throw DecodingError.MissingKey(key: key, dictionary: self) }
         
         return value
     }
     
-    func maybeValueFor(key: Swift.String, nilOnNull: Bool = true, throwOnMissing: Bool = true) throws -> Value? {
-        let dictionary = try asDictionary()
-    
-        guard let value = dictionary[key] else {
-            if throwOnMissing { throw DecodingError.MissingKey(key: key, dictionary: dictionary) }
+    func maybeValueFor(key: String, nilOnNull: Bool = true, throwOnMissing: Bool = true) throws -> Value? {
+        let `self` = self as! [String: Value]
+        
+        guard let value = self[key] else {
+            if throwOnMissing { throw DecodingError.MissingKey(key: key, dictionary: self) }
             else { return nil }
         }
         
-        if nilOnNull, case .Null = value { return nil }
+        if nilOnNull && value == .Null { return nil }
         else { return value }
+    }
+}
+
+public extension Value {
+    func valueAt(index: Int) throws -> Value {
+        return try asArray().valueAt(index)
+    }
+    
+    func maybeValueAt(index: Int, nilOnNull: Bool = true, throwOnMissing: Bool = true) throws -> Value? {
+        return try asArray().maybeValueAt(index, nilOnNull: nilOnNull, throwOnMissing: throwOnMissing)
+    }
+    
+    func valueFor(key: Swift.String) throws -> Value {
+        return try asDictionary().valueFor(key)
+    }
+    
+    func maybeValueFor(key: Swift.String, nilOnNull: Bool = true, throwOnMissing: Bool = true) throws -> Value? {
+        return try asDictionary().maybeValueFor(key, nilOnNull: nilOnNull, throwOnMissing: throwOnMissing)
     }
 }
 
@@ -61,7 +77,7 @@ public extension Value {
     func asInt() throws -> Int {
         switch self {
         case let .Integer(int): return int
-        case let .Double(double): return Int(double)
+        case let .Double(double) where double <= Swift.Double(Int.max): return Int(double)
         case let .String(string):
             if let int = Int(string) { return int }
             else { fallthrough }
@@ -120,7 +136,7 @@ public extension Value {
     func asInt64() throws -> Int64 {
         switch self {
         case let .Integer(int): return Int64(int)
-        case let .Double(double): return Int64(double)
+        case let .Double(double) where double <= Swift.Double(Int64.max): return Int64(double)
         case let .String(string):
             if let int64 = Int64(string) { return int64 }
             else { fallthrough }

@@ -12,7 +12,7 @@ public extension Value {
 
 extension NSURL: Decodable {
     public static func _decode(value: Value) throws -> Self {
-        if let url = try self.init(string: value.asString()) {
+        if let string = value.stringValue, let url = self.init(string: string) {
             return url
         } else {
             throw DecodingError.TypeMismatch(expectedType: NSURL.self, value: value)
@@ -22,7 +22,7 @@ extension NSURL: Decodable {
 
 extension NSData: Decodable {
     public static func _decode(value: Value) throws -> Self {
-        if let data = try value.asString().dataUsingEncoding(NSUTF8StringEncoding) {
+        if let string = value.stringValue, let data = string.dataUsingEncoding(NSUTF8StringEncoding) {
             return self.init(data: data)
         } else {
             throw DecodingError.TypeMismatch(expectedType: NSData.self, value: value)
@@ -36,7 +36,7 @@ extension NSDate: Decodable {
             if dateInterval > 1000000000000 { dateInterval /= 1000 }
             
             return self.init(timeIntervalSince1970: dateInterval)
-        } else if let dateString = try? value.asString() {
+        } else if let dateString = value.stringValue {
             for format in dateFormatStrings {
                 let dateFormatter = NSDateFormatter()
                 dateFormatter.dateFormat = format

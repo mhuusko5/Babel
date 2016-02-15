@@ -21,24 +21,11 @@ public extension Decodable {
     }
 }
 
-public extension Value {
-    func decodeValue<T: Decodable>(type type: T.Type = T.self) throws -> T {
-        return try T.decode(self)
-    }
-    
-    func decodeValue<T: Decodable>(type type: T.Type = T.self, ignoreFailure: Bool = false) throws -> T? {
-        do {
-            return try T.decode(self)
-        } catch let error {
-            if ignoreFailure { return nil }
-            else { throw error }
-        }
-    }
-    
-    func decodeArray<T: Decodable>(type type: T.Type = T.self, ignoreFailures: Bool = false) throws -> [T] {
+public extension _ArrayType where Generator.Element == Value {
+    func decode<T: Decodable>(type type: T.Type = T.self, ignoreFailures: Bool = false) throws -> [T] {
         var array = [T]()
         
-        for value in try asArray() {
+        for value in self {
             do {
                 try array.append(T.decode(value))
             } catch let error {
@@ -48,19 +35,48 @@ public extension Value {
     
         return array
     }
-    
-    func decodeDictionary<T: Decodable>(type type: T.Type = T.self, ignoreFailures: Bool = false) throws -> [Swift.String: T] {
-        var dictionary: [Swift.String: T] = [:]
+}
+
+public extension CollectionType where Generator.Element == (String, Value) {
+    func decode<K: Decodable, V: Decodable>(keyType keyType: K.Type = K.self, valueType: V.Type = V.self, ignoreFailures: Bool = false) throws -> [K: V] {
+        var dictionary = [K: V]()
         
-        for (key, value) in try asDictionary() {
+        for (key, value) in self {
             do {
-                dictionary[key] = try T.decode(value)
+                if let key = key as? K {
+                    dictionary[key] = try V.decode(value)
+                } else {
+                    dictionary[try K.decode(.String(key))] = try V.decode(value)
+                }
             } catch let error {
                 if !ignoreFailures { throw error }
             }
         }
         
         return dictionary
+    }
+}
+
+public extension Value {
+    func decode<T: Decodable>(type type: T.Type = T.self) throws -> T {
+        return try T.decode(self)
+    }
+    
+    func decode<T: Decodable>(type type: T.Type = T.self, ignoreFailure: Bool = false) throws -> T? {
+        do {
+            return try T.decode(self)
+        } catch let error {
+            if ignoreFailure { return nil }
+            else { throw error }
+        }
+    }
+    
+    func decodeArray<T: Decodable>(type type: T.Type = T.self, ignoreFailures: Bool = false) throws -> [T] {
+        return try asArray().decode(ignoreFailures: ignoreFailures)
+    }
+    
+    func decodeDictionary<K: Decodable, V: Decodable>(keyType keyType: K.Type = K.self, valueType: V.Type = V.self, ignoreFailures: Bool = false) throws -> [K: V] {
+        return try asDictionary().decode(ignoreFailures: ignoreFailures)
     }
 }
 
