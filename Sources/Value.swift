@@ -36,6 +36,14 @@ public extension Value {
     }
 }
 
+private extension Dictionary {
+    init(_ elements: [Element]) {
+        self.init(minimumCapacity: elements.count)
+        
+        for (key, value) in elements { self[key] = value }
+    }
+}
+
 public extension Value {
     var boolValue: Bool? {
         if case let .Boolean(bool) = self { return bool }
@@ -75,14 +83,7 @@ public extension Value {
         case let .Double(double): return double
         case let .String(string): return string
         case let .Array(array): return array.map { $0.nativeValue }
-        case let .Dictionary(dictionary):
-            var nativeDictionary: [Swift.String: Any?] = [:]
-            
-            for (key, value) in dictionary {
-                nativeDictionary[key] = value.nativeValue
-            }
-            
-            return nativeDictionary
+        case let .Dictionary(dictionary): return Swift.Dictionary(dictionary.map { ($0, $1.nativeValue) })
         }
     }
 }
@@ -164,10 +165,6 @@ extension Value: ArrayLiteralConvertible {
 
 extension Value: DictionaryLiteralConvertible {
     public init(dictionaryLiteral elements: (StringLiteralType, Value)...) {
-        var dictionary = [StringLiteralType: Value](minimumCapacity: elements.count)
-
-        for (key, value) in elements { dictionary[key] = value }
-        
-        self = .Dictionary(dictionary)
+        self = .Dictionary([StringLiteralType: Value](elements))
     }
 }

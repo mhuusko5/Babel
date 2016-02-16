@@ -147,8 +147,6 @@ public extension Value {
     func asCharacter() throws -> Character {
         if case let .String(string) = self, let character = string.characters.first where string.characters.count == 1 {
             return character
-        } else {
-            throw DecodingError.TypeMismatch(expectedType: Character.self, value: self)
-        }
+        } else { throw DecodingError.TypeMismatch(expectedType: Character.self, value: self) }
     }
 }

@@ -1,4 +1,8 @@
-import Foundation
+import class Foundation.NSData
+import class Foundation.NSDate
+import class Foundation.NSURL
+import class Foundation.NSDateFormatter
+import class Foundation.NSLocale
 
 public extension Value {
     init(JSON: NSData) throws {
@@ -7,6 +11,12 @@ public extension Value {
         } else {
             throw ParsingError.InvalidData
         }
+    }
+}
+
+public extension Decodable {
+    static func decode(JSON JSON: NSData) throws -> Self {
+        return try decode(Value(JSON: JSON))
     }
 }
 
@@ -40,7 +50,7 @@ extension NSDate: Decodable {
             for format in dateFormatStrings {
                 let dateFormatter = NSDateFormatter()
                 dateFormatter.dateFormat = format
-                dateFormatter.locale = NSLocale(localeIdentifier: "en_US_POSIX")
+                dateFormatter.locale = NSLocale(localeIdentifier: dataFormatLocale)
                 
                 if let date = dateFormatter.dateFromString(dateString) {
                     return self.init(timeIntervalSince1970: date.timeIntervalSince1970)
@@ -53,6 +63,8 @@ extension NSDate: Decodable {
         }
     }
 }
+
+public var dataFormatLocale = "en_US_POSIX"
 
 public var dateFormatStrings = [
     "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",

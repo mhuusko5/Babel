@@ -2,6 +2,10 @@ public func prettyPrint(any: Any) {
     print(prettyDescription(any), terminator: "\n\n")
 }
 
+public func prettyPrint(prepend: String, _ any: Any) {
+    print(prepend + prettyDescription(any), terminator: "\n\n")
+}
+
 public func prettyDescription(any: Any) -> String {
     guard let any = deepUnwrap(any) else {
 		return "nil"

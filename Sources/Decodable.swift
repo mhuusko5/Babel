@@ -19,6 +19,10 @@ public extension Decodable {
             } else { throw error }
         }
     }
+    
+    static func decode(JSON JSON: String) throws -> Self {
+        return try decode(Value(JSON: JSON))
+    }
 }
 
 public extension _ArrayType where Generator.Element == Value {
@@ -71,11 +75,11 @@ public extension Value {
         }
     }
     
-    func decodeArray<T: Decodable>(type type: T.Type = T.self, ignoreFailures: Bool = false) throws -> [T] {
+    func decode<T: Decodable>(type type: T.Type = T.self, ignoreFailures: Bool = false) throws -> [T] {
         return try asArray().decode(ignoreFailures: ignoreFailures)
     }
     
-    func decodeDictionary<K: Decodable, V: Decodable>(keyType keyType: K.Type = K.self, valueType: V.Type = V.self, ignoreFailures: Bool = false) throws -> [K: V] {
+    func decode<K: Decodable, V: Decodable>(keyType keyType: K.Type = K.self, valueType: V.Type = V.self, ignoreFailures: Bool = false) throws -> [K: V] {
         return try asDictionary().decode(ignoreFailures: ignoreFailures)
     }
 }
