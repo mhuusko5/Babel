@@ -15,7 +15,6 @@
 		D0D40B061C710D89006424B5 /* JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0D40AFF1C710D89006424B5 /* JSON.swift */; };
 		D0D40B071C710D89006424B5 /* Operators.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0D40B001C710D89006424B5 /* Operators.swift */; };
 		D0D40B081C710D89006424B5 /* Value.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0D40B011C710D89006424B5 /* Value.swift */; };
-		D0D40B0A1C71116B006424B5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0D40B091C71116B006424B5 /* Foundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,7 +28,6 @@
 		D0D40AFF1C710D89006424B5 /* JSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSON.swift; sourceTree = "<group>"; };
 		D0D40B001C710D89006424B5 /* Operators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Operators.swift; sourceTree = "<group>"; };
 		D0D40B011C710D89006424B5 /* Value.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Value.swift; sourceTree = "<group>"; };
-		D0D40B091C71116B006424B5 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -37,7 +35,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D0D40B0A1C71116B006424B5 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,7 +62,6 @@
 			children = (
 				D0D40AFA1C710D89006424B5 /* Sources */,
 				D0D40ACA1C710A98006424B5 /* Supporting Files */,
-				D0D40B0B1C711180006424B5 /* Frameworks */,
 			);
 			path = Babel;
 			sourceTree = "<group>";
@@ -93,15 +89,6 @@
 			name = Sources;
 			path = ../Sources;
 			sourceTree = SOURCE_ROOT;
-		};
-		D0D40B0B1C711180006424B5 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				D0D40B091C71116B006424B5 /* Foundation.framework */,
-			);
-			name = Frameworks;
-			path = ..;
-			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 

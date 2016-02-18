@@ -119,7 +119,7 @@ public func prettyDescription(any: Any) -> String {
     }
 }
 
-func deepUnwrap(any: Any) -> Any? {
+private func deepUnwrap(any: Any) -> Any? {
 	let mirror = Mirror(reflecting: any)
 	
 	if mirror.displayStyle != .Optional {

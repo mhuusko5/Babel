@@ -1,7 +1,9 @@
 #if os(Linux)
-import Glibc
+import func Glibc.pow
+import func Glibc.floor
 #else
-import Darwin
+import func Darwin.pow
+import func Darwin.floor
 #endif
 
 public extension Value {
