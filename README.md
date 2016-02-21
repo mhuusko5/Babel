@@ -37,8 +37,6 @@ First of all, please play around with `Xcode/Babel.playground` (where this is cu
 ```swift
 import Babel
 
-// ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
-
 let jsonString = "<JSON HERE, SEE PLAYGROUND>"
 
 let jsonData = jsonString.dataUsingEncoding(NSUTF8StringEncoding)!
@@ -70,9 +68,10 @@ case .LiteralConvertible:
         ]
     ]
 }
+```
+### Each of the decoding examples below is semantically equivalent (navigates/parses/succeeds/fails in the same way for the given data model). Which do you prefer (it's okay to not like custom operators ;) )?
 
-// ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
-
+```swift
 do {
     let content: [Int: NSURL]?
     
