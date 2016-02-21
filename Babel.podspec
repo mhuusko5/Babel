@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name = 'Babel'
   s.version = '0.1.0'
-  s.summary = 'JSON! Parse it quickly! Decode it semantically (and easily)!'
+  s.summary = 'JSON! *Pure Swift*, failure driven, inferred *but unambiguous*, with powerful *but optional* operators.'
   s.description = 'JSON! *Pure Swift*, failure driven, inferred *but unambiguous*, with powerful *but optional* operators.'
 
   s.license = { :type => 'MIT', :file => 'LICENSE' }
