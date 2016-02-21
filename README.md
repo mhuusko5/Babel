@@ -81,7 +81,8 @@ do {
         content = try value =>? "data" => "items" =>?? 0 => "content"
         
     case .FunctionInferred:
-        content = try value.maybeValueFor("data")?.valueFor("items").maybeValueAt(0, throwOnMissing: false)?.valueFor("content").decode()
+        content = try value.maybeValueFor("data")?.valueFor("items")
+                           .maybeValueAt(0, throwOnMissing: false)?.valueFor("content").decode()
         
     case .FunctionExplicit:
         content = try value.asDictionary()
