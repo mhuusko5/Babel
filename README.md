@@ -69,7 +69,7 @@ case .LiteralConvertible:
     ]
 }
 ```
-### Each of the decoding examples below is semantically equivalent (navigates/parses/succeeds/fails in the same way for the given data model). Which do you prefer (it's okay to not like custom operators ;) )?
+##### Each of the decoding examples below is semantically equivalent (navigates/parses/succeeds/fails in the same way for the given data model). Which do you prefer (it's okay to not like custom operators ;) )?
 
 ```swift
 do {
