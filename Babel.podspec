@@ -2,7 +2,6 @@ Pod::Spec.new do |s|
   s.name = 'Babel'
   s.version = '0.1.0'
   s.summary = 'JSON! *Pure Swift*, failure driven, inferred *but unambiguous*, with powerful *but optional* operators.'
-  s.description = 'JSON! *Pure Swift*, failure driven, inferred *but unambiguous*, with powerful *but optional* operators.'
 
   s.license = { :type => 'MIT', :file => 'LICENSE' }
   s.authors = { 'Mathew Huusko V' => 'mhuusko5@gmail.com' }
@@ -13,9 +12,12 @@ Pod::Spec.new do |s|
   s.platforms = { :osx => '10.9', :ios => '8.0', :tvos => '9.0', :watchos => '2.0' }
   s.requires_arc = true
 
-  s.source_files = 'Sources/Value.swift', 'Sources/JSON.swift', 'Sources/Decoding.swift'
+  s.subspec 'Core' do |ss|
+    ss.source_files = 'Sources/Value.swift', 'Sources/JSON.swift', 'Sources/Decoding.swift'
+  end
 
   s.subspec 'Decodable' do |ss|
+    ss.dependency 'Babel/Core'
     ss.source_files = 'Sources/Decodable.swift'
   end
 
@@ -34,5 +36,5 @@ Pod::Spec.new do |s|
     ss.source_files = 'Sources/Helpers.swift'
   end
 
-  s.default_subspecs = 'Decodable', 'Operators', 'Foundation'
+  s.default_subspecs = 'Core', 'Decodable', 'Operators', 'Foundation'
 end
