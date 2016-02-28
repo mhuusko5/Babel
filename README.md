@@ -67,6 +67,8 @@ case .LiteralConvertible:
             "totalItems": 800
         ]
     ]
+case .NSObject:
+    value = try! Value(NSObject: NSJSONSerialization.JSONObjectWithData(jsonData, options: .AllowFragments))
 }
 ```
 ##### Each of the decoding examples below is semantically equivalent (navigates/parses/succeeds/fails in the same way for the given data model). Which do you prefer (it's okay to not like custom operators ;) )?
