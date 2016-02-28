@@ -1,6 +1,7 @@
 public indirect enum DecodableError: ErrorType {
     case Nested(Decodable.Type, DecodableError)
     case Immediate(Decodable.Type, DecodingError)
+    case Parsing(Decodable.Type, ParsingError)
 }
 
 public protocol Decodable {
@@ -12,16 +13,21 @@ public extension Decodable {
         do {
             return try _decode(value)
         } catch let error {
-            if let error = error as? DecodableError {
-                throw DecodableError.Nested(self, error)
-            } else if let error = error as? DecodingError {
-                throw DecodableError.Immediate(self, error)
-            } else { throw error }
+            switch error {
+            case let error as DecodableError: throw DecodableError.Nested(self, error)
+            case let error as DecodingError: throw DecodableError.Immediate(self, error)
+            case let error as ParsingError: throw DecodableError.Parsing(self, error)
+            default: throw error
+            }
         }
     }
     
     static func decode(JSON JSON: String) throws -> Self {
         return try decode(Value(JSON: JSON))
+    }
+    
+    static func decode(native native: Any?) throws -> Self {
+        return try decode(Value(native: native))
     }
 }
 

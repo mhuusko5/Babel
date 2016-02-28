@@ -77,7 +77,7 @@ public extension Value {
     func asInt() throws -> Int {
         switch self {
         case let .Integer(int): return int
-        case let .Double(double) where double <= Swift.Double(Int.max): return Int(double)
+        case let .Double(double) where double < Swift.Double(Int.max): return Int(double)
         case let .String(string):
             if let int = Int(string) { return int }
             else { fallthrough }
@@ -136,7 +136,7 @@ public extension Value {
     func asInt64() throws -> Int64 {
         switch self {
         case let .Integer(int): return Int64(int)
-        case let .Double(double) where double <= Swift.Double(Int64.max): return Int64(double)
+        case let .Double(double) where double < Swift.Double(Int64.max): return Int64(double)
         case let .String(string):
             if let int64 = Int64(string) { return int64 }
             else { fallthrough }

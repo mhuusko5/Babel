@@ -15,13 +15,13 @@ public func prettyDescription(any: Any) -> String {
         return "Void"
     }
 	
-	if let int = any as? Int {
-		return String(int)
-	} else if let double = any as? Double {
+	if let double = any as? Double {
 		return String(double)
 	} else if let float = any as? Float {
 		return String(float)
-	} else if let bool = any as? Bool {
+    } else if let int = any as? Int {
+        return String(int)
+    } else if let bool = any as? Bool {
 		return String(bool)
 	} else if let string = any as? String {
 		return "\"\(string)\""

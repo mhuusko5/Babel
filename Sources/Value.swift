@@ -36,14 +36,6 @@ public extension Value {
     }
 }
 
-private extension Dictionary {
-    init(_ elements: [Element]) {
-        self.init(minimumCapacity: elements.count)
-        
-        for (key, value) in elements { self[key] = value }
-    }
-}
-
 public extension Value {
     var boolValue: Bool? {
         if case let .Boolean(bool) = self { return bool }
@@ -83,7 +75,7 @@ public extension Value {
         case let .Double(double): return double
         case let .String(string): return string
         case let .Array(array): return array.map { $0.nativeValue }
-        case let .Dictionary(dictionary): return Swift.Dictionary(dictionary.map { ($0, $1.nativeValue) })
+        case let .Dictionary(dictionary): return dictionary.dictMap { ($0, $1.nativeValue) }
         }
     }
 }
@@ -131,6 +123,38 @@ public extension Value {
     init(_ dictionary: [Swift.String: Value]) { self = .Dictionary(dictionary) }
 }
 
+public enum ParsingError: ErrorType {
+    case InvalidData
+    case UnexpectedToken(reason: String, lineNumber: Int, columnNumber: Int)
+    case InsufficientToken(reason: String, lineNumber: Int, columnNumber: Int)
+    case ExtraToken(reason: String, lineNumber: Int, columnNumber: Int)
+    case NonStringKey(reason: String, lineNumber: Int, columnNumber: Int)
+    case InvalidString(reason: String, lineNumber: Int, columnNumber: Int)
+    case InvalidNumber(reason: String, lineNumber: Int, columnNumber: Int)
+}
+
+public extension Value {
+    init(native: Any?) throws {
+        switch native {
+        case nil: self = .Null
+        case let bool as Bool: self = .Boolean(bool)
+        case let int as Int: self = .Integer(int)
+        case let int64 as Int64:
+            if int64 < Int64(Int.max) { self = .Integer(Int(int64)) }
+            else { self = .Double(Swift.Double(int64)) }
+        case let double as Swift.Double: self = .Double(double)
+        case let float as Float: self = .Double(Swift.Double(float))
+        case let string as Swift.String: self = .String(string)
+        default:
+            if let dictionary = castDictionary(native) {
+                self = try .Dictionary(dictionary.dictMap { try ($0, Value(native: $1)) })
+            } else if let array = castArray(native) {
+                self = try .Array(array.map { try Value(native: $0) })
+            } else { throw ParsingError.InvalidData }
+        }
+    }
+}
+
 extension Value: NilLiteralConvertible {
     public init(nilLiteral value: Void) { self = .Null }
 }
@@ -167,4 +191,50 @@ extension Value: DictionaryLiteralConvertible {
     public init(dictionaryLiteral elements: (StringLiteralType, Value)...) {
         self = .Dictionary([StringLiteralType: Value](elements))
     }
+}
+
+// MARK: - Helpers -
+
+private extension Dictionary {
+    init(_ elements: [Element]) {
+        self.init(minimumCapacity: elements.count)
+        
+        for (key, value) in elements { self[key] = value }
+    }
+    
+    func dictMap<K, V>(@noescape transform: (Key, Value) throws -> (K, V)) rethrows -> [K: V] {
+        return try [K: V](map(transform))
+    }
+}
+
+private func castDictionary(any: Any) -> [String: Any]? {
+    let mirror = Mirror(reflecting: any)
+    
+    guard let displayStyle = mirror.displayStyle where displayStyle == .Dictionary else {
+        return nil
+    }
+    
+    var dictionary = [String: Any]()
+    
+    for property in Array(mirror.children) {
+        let pair = Array(Mirror(reflecting: property.value).children)
+        
+        if let key = pair[0].value as? String {
+            dictionary[key] = pair[1].value
+        } else {
+            return nil
+        }
+    }
+    
+    return dictionary
+}
+
+private func castArray(any: Any) -> [Any]? {
+    let mirror = Mirror(reflecting: any)
+    
+    if let displayStyle = mirror.displayStyle where displayStyle == .Collection || displayStyle == .Set {
+        return Array(mirror.children).map { $0.value }
+    }
+    
+    return nil
 }

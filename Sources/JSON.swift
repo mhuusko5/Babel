@@ -20,16 +20,6 @@ public extension Value {
     }
 }
 
-public enum ParsingError: ErrorType {
-    case InvalidData
-    case UnexpectedToken(reason: String, lineNumber: Int, columnNumber: Int)
-    case InsufficientToken(reason: String, lineNumber: Int, columnNumber: Int)
-    case ExtraToken(reason: String, lineNumber: Int, columnNumber: Int)
-    case NonStringKey(reason: String, lineNumber: Int, columnNumber: Int)
-    case InvalidString(reason: String, lineNumber: Int, columnNumber: Int)
-    case InvalidNumber(reason: String, lineNumber: Int, columnNumber: Int)
-}
-
 class JSONParser<ByteSequence: CollectionType where ByteSequence.Generator.Element == UInt8> {
     typealias Source = ByteSequence
     private typealias Char = Source.Generator.Element
@@ -293,7 +283,7 @@ class JSONParser<ByteSequence: CollectionType where ByteSequence.Generator.Eleme
         
         let double = sign * (Double(integer) + fraction) * pow(10, Double(exponent))
         
-        if floor(double) == double {
+        if double < Double(Int.max) && floor(double) == double {
             return .Integer(Int(double))
         } else {
             return .Double(double)

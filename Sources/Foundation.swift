@@ -12,11 +12,41 @@ public extension Value {
             throw ParsingError.InvalidData
         }
     }
+    
+    init(NSObject: AnyObject) throws {
+        switch NSObject {
+        case let string as NSString: self = .String(string as Swift.String)
+        case is NSNull: self = .Null
+        case let dictionary as NSDictionary: 
+            var parsedDictionary: [Swift.String: Value] = [:]
+        
+            for (key, value) in dictionary {
+                if let key = key as? Swift.String {
+                    parsedDictionary[key] = try Value(NSObject: value)
+                } else { throw ParsingError.InvalidData }
+            }
+            
+            self = .Dictionary(parsedDictionary)
+        case let array as NSArray: self = try .Array(array.map { try Value(NSObject: $0) })
+        case let number as NSNumber:
+            switch Swift.String.fromCString(number.objCType)! {
+            case "i", "l", "q" where number.longLongValue < Int64(Int.max): self = .Integer(number as Int)
+            case "q", "d", "f": self = .Double(number as Swift.Double)
+            case "B", "c", "i": self = .Boolean(number as Bool)
+            default: throw ParsingError.InvalidData
+            }
+        default: throw ParsingError.InvalidData
+        }
+    }
 }
 
 public extension Decodable {
     static func decode(JSON JSON: NSData) throws -> Self {
         return try decode(Value(JSON: JSON))
+    }
+    
+    static func decode(NSObject NSObject: AnyObject) throws -> Self {
+        return try decode(Value(NSObject: NSObject))
     }
 }
 

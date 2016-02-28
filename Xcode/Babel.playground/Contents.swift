@@ -8,9 +8,10 @@ enum DataExample {
     case Literal
     case LiteralShort
     case LiteralBadData
+    case NSObject
 }
 
-let dataExample = DataExample.String
+let dataExample = DataExample.NSObject
 
 enum DecodingExample {
     case Operators
@@ -85,6 +86,8 @@ case .LiteralBadData:
             "totalItems": 800
         ]
     ]
+case .NSObject:
+    value = try! Value(NSObject: NSJSONSerialization.JSONObjectWithData(jsonData, options: .AllowFragments))
 }
 
 prettyPrint("Value: ", value)
