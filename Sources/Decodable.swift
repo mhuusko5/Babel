@@ -11,7 +11,11 @@ public protocol Decodable {
 public extension Decodable {
     static func decode(value: Value) throws -> Self {
         do {
-            return try _decode(value)
+            if let value = value.otherValue as? Self {
+                return value
+            } else {
+                return try _decode(value)
+            }
         } catch let error {
             switch error {
             case let error as DecodableError: throw DecodableError.Nested(self, error)

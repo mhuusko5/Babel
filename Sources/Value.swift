@@ -6,6 +6,7 @@ public enum Value {
     case String(Swift.String)
     case Array([Value])
     case Dictionary([Swift.String: Value])
+    case Other(Any)
 }
 
 public extension Value {
@@ -33,6 +34,10 @@ public extension Value {
     
     var isDictionary: Bool {
         if case .Dictionary = self { return true } else { return false }
+    }
+    
+    var isOther: Bool {
+        if case .Other = self { return true } else { return false }
     }
 }
 
@@ -67,6 +72,11 @@ public extension Value {
         else { return nil }
     }
     
+    var otherValue: Any? {
+        if case let .Other(other) = self { return other }
+        else { return nil }
+    }
+    
     var nativeValue: Any? {
         switch self {
         case .Null: return nil
@@ -76,6 +86,7 @@ public extension Value {
         case let .String(string): return string
         case let .Array(array): return array.map { $0.nativeValue }
         case let .Dictionary(dictionary): return dictionary.dictMap { ($0, $1.nativeValue) }
+        case let .Other(other): return other
         }
     }
 }
@@ -121,6 +132,8 @@ public extension Value {
     init(_ array: [Value]) { self = .Array(array) }
     
     init(_ dictionary: [Swift.String: Value]) { self = .Dictionary(dictionary) }
+    
+    init(other: Any) { self = .Other(other) }
 }
 
 public enum ParsingError: ErrorType {
@@ -134,7 +147,7 @@ public enum ParsingError: ErrorType {
 }
 
 public extension Value {
-    init(native: Any?) throws {
+    init(native: Any?) {
         switch native {
         case nil: self = .Null
         case let bool as Bool: self = .Boolean(bool)
@@ -147,10 +160,12 @@ public extension Value {
         case let string as Swift.String: self = .String(string)
         default:
             if let dictionary = castDictionary(native) {
-                self = try .Dictionary(dictionary.dictMap { try ($0, Value(native: $1)) })
+                self = .Dictionary(dictionary.dictMap { ($0, Value(native: $1)) })
             } else if let array = castArray(native) {
-                self = try .Array(array.map { try Value(native: $0) })
-            } else { throw ParsingError.InvalidData }
+                self = .Array(array.map { Value(native: $0) })
+            } else {
+                self = .Other(native)
+            }
         }
     }
 }

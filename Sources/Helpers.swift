@@ -46,7 +46,7 @@ public func prettyDescription(any: Any) -> String {
     
     switch displayStyle {
     case .Tuple:
-        if properties.count == 0 { return "()" }
+        if properties.isEmpty { return "()" }
         
         var string = "("
         
@@ -62,7 +62,7 @@ public func prettyDescription(any: Any) -> String {
         
         return string + ")"
     case .Collection, .Set:
-        if properties.count == 0 { return "[]" }
+        if properties.isEmpty { return "[]" }
         
         var string = "["
     
@@ -72,7 +72,7 @@ public func prettyDescription(any: Any) -> String {
         
         return string + "\r]"
     case .Dictionary:
-        if properties.count == 0 { return "[:]" }
+        if properties.isEmpty { return "[:]" }
         
         var string = "["
         
@@ -88,7 +88,7 @@ public func prettyDescription(any: Any) -> String {
             return any.debugDescription
         }
         
-        if properties.count == 0 { return "\(mirror.subjectType)." + String(any) }
+        if properties.isEmpty { return "\(mirror.subjectType)." + String(any) }
         
         var string = "\(mirror.subjectType).\(properties.first!.label!)"
         
@@ -106,7 +106,7 @@ public func prettyDescription(any: Any) -> String {
             return any.debugDescription
         }
         
-        if properties.count == 0 { return "\(typeName)\(String(any))" }
+        if properties.isEmpty { return "\(typeName)\(String(any))" }
         
         var string = "\(typeName){"
         

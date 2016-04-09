@@ -13,7 +13,7 @@ public extension Value {
         }
     }
     
-    init(NSObject: AnyObject) throws {
+    init(NSObject: AnyObject) {
         switch NSObject {
         case let string as NSString: self = .String(string as Swift.String)
         case is NSNull: self = .Null
@@ -22,20 +22,25 @@ public extension Value {
         
             for (key, value) in dictionary {
                 if let key = key as? Swift.String {
-                    parsedDictionary[key] = try Value(NSObject: value)
-                } else { throw ParsingError.InvalidData }
+                    parsedDictionary[key] = Value(NSObject: value)
+                } else {
+                    self = .Other(dictionary)
+                    return
+                }
             }
             
             self = .Dictionary(parsedDictionary)
-        case let array as NSArray: self = try .Array(array.map { try Value(NSObject: $0) })
+        case let array as NSArray: self = .Array(array.map { Value(NSObject: $0) })
+        case let set as NSSet: self = .Array(set.allObjects.map { Value(NSObject: $0) })
+        case let decimal as NSDecimalNumber: self = .Double(decimal.doubleValue)
         case let number as NSNumber:
             switch Swift.String.fromCString(number.objCType)! {
             case "i", "l", "q" where number.longLongValue < Int64(Int.max): self = .Integer(number as Int)
             case "q", "d", "f": self = .Double(number as Swift.Double)
             case "B", "c", "i": self = .Boolean(number as Bool)
-            default: throw ParsingError.InvalidData
+            default: self = .Other(number)
             }
-        default: throw ParsingError.InvalidData
+        default: self = .Other(NSObject)
         }
     }
 }

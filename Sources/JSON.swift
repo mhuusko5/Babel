@@ -33,8 +33,8 @@ class JSONParser<ByteSequence: CollectionType where ByteSequence.Generator.Eleme
     
     init(_ source: Source) {
         self.source = source
-        self.cur = source.startIndex
-        self.end = source.endIndex
+        cur = source.startIndex
+        end = source.endIndex
     }
     
     func parse() throws -> Value {
@@ -419,7 +419,7 @@ class JSONParser<ByteSequence: CollectionType where ByteSequence.Generator.Eleme
     private func advance() {
         assert(cur != end, "out of range")
         
-        cur++
+        cur = cur.successor()
         
         if cur != end {
             switch currentChar {
