@@ -80,7 +80,8 @@ extension NSDate: Decodable {
             for format in dateFormatStrings {
                 let dateFormatter = NSDateFormatter()
                 dateFormatter.dateFormat = format
-                dateFormatter.locale = NSLocale(localeIdentifier: dataFormatLocale)
+                dateFormatter.timeZone = dateFormatTimezone
+                dateFormatter.locale = dateFormatLocale
                 
                 if let date = dateFormatter.dateFromString(dateString) {
                     return self.init(timeIntervalSince1970: date.timeIntervalSince1970)
@@ -94,7 +95,8 @@ extension NSDate: Decodable {
     }
 }
 
-public var dataFormatLocale = "en_US_POSIX"
+public var dateFormatTimezone = NSTimeZone(abbreviation: "UTC")
+public var dateFormatLocale = NSLocale(localeIdentifier: "en_US_POSIX")
 
 public var dateFormatStrings = [
     "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
