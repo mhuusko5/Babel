@@ -136,16 +136,6 @@ public extension Value {
     init(other: Any) { self = .Other(other) }
 }
 
-public enum ParsingError: ErrorType {
-    case InvalidData
-    case UnexpectedToken(reason: String, lineNumber: Int, columnNumber: Int)
-    case InsufficientToken(reason: String, lineNumber: Int, columnNumber: Int)
-    case ExtraToken(reason: String, lineNumber: Int, columnNumber: Int)
-    case NonStringKey(reason: String, lineNumber: Int, columnNumber: Int)
-    case InvalidString(reason: String, lineNumber: Int, columnNumber: Int)
-    case InvalidNumber(reason: String, lineNumber: Int, columnNumber: Int)
-}
-
 public extension Value {
     init(native: Any?) {
         switch native {

@@ -79,8 +79,8 @@
 			isa = PBXGroup;
 			children = (
 				D0D40B011C710D89006424B5 /* Value.swift */,
-				D0D40AFF1C710D89006424B5 /* JSON.swift */,
 				D0D40AFC1C710D89006424B5 /* Decoding.swift */,
+				D0D40AFF1C710D89006424B5 /* JSON.swift */,
 				D0D40AFB1C710D89006424B5 /* Decodable.swift */,
 				D0D40B001C710D89006424B5 /* Operators.swift */,
 				D0D40AFD1C710D89006424B5 /* Foundation.swift */,

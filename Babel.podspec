@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'Babel'
-  s.version = '0.3.0'
+  s.version = '0.4.0'
   s.summary = 'JSON! *Pure Swift*, failure driven, inferred *but unambiguous*, with powerful *but optional* operators.'
 
   s.license = { :type => 'MIT', :file => 'LICENSE' }
@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.requires_arc = true
 
   s.subspec 'Core' do |ss|
-    ss.source_files = 'Sources/Value.swift', 'Sources/JSON.swift', 'Sources/Decoding.swift'
+    ss.source_files = 'Sources/Value.swift', 'Sources/Decoding.swift', 'Sources/JSON.swift'
   end
 
   s.subspec 'Decodable' do |ss|

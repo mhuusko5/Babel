@@ -2,14 +2,15 @@ import class Foundation.NSData
 import class Foundation.NSDate
 import class Foundation.NSURL
 import class Foundation.NSDateFormatter
+import class Foundation.NSTimeZone
 import class Foundation.NSLocale
 
 public extension Value {
-    init(JSON: NSData) throws {
-        if let string = Swift.String(data: JSON, encoding: NSUTF8StringEncoding) {
-            self = try JSONParser(string.utf8).parse()
+    init(JSON: NSData, encoding: NSStringEncoding = NSUTF8StringEncoding) throws {
+        if let string = Swift.String(data: JSON, encoding: encoding) {
+            try self.init(JSON: string)
         } else {
-            throw ParsingError.InvalidData
+            throw DecodingError.InvalidData(data: JSON)
         }
     }
     
@@ -35,9 +36,14 @@ public extension Value {
         case let decimal as NSDecimalNumber: self = .Double(decimal.doubleValue)
         case let number as NSNumber:
             switch Swift.String.fromCString(number.objCType)! {
-            case "i", "l", "q" where number.longLongValue < Int64(Int.max): self = .Integer(number as Int)
-            case "q", "d", "f": self = .Double(number as Swift.Double)
-            case "B", "c", "i": self = .Boolean(number as Bool)
+            case "i", "l", "q":
+                if number.longLongValue < Int64(Int.max) {
+                    self = .Integer(number.integerValue)
+                } else {
+                    self = .Double(number.doubleValue)
+                }
+            case "q", "d", "f": self = .Double(number.doubleValue)
+            case "B", "c": self = .Boolean(number.boolValue)
             default: self = .Other(number)
             }
         default: self = .Other(NSObject)
@@ -67,13 +73,15 @@ extension NSURL: Decodable {
 
 extension NSData: Decodable {
     public static func _decode(value: Value) throws -> Self {
-        if let string = value.stringValue, let data = string.dataUsingEncoding(NSUTF8StringEncoding) {
+        if let string = value.stringValue, let data = string.dataUsingEncoding(dataStringEncoding) {
             return self.init(data: data)
         } else {
             throw DecodingError.TypeMismatch(expectedType: NSData.self, value: value)
         }
     }
 }
+
+public var dataStringEncoding = NSUTF8StringEncoding
 
 extension NSDate: Decodable {
     public static func _decode(value: Value) throws -> Self {

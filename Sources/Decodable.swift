@@ -1,7 +1,6 @@
 public indirect enum DecodableError: ErrorType {
     case Nested(Decodable.Type, DecodableError)
     case Immediate(Decodable.Type, DecodingError)
-    case Parsing(Decodable.Type, ParsingError)
 }
 
 public protocol Decodable {
@@ -20,7 +19,6 @@ public extension Decodable {
             switch error {
             case let error as DecodableError: throw DecodableError.Nested(self, error)
             case let error as DecodingError: throw DecodableError.Immediate(self, error)
-            case let error as ParsingError: throw DecodableError.Parsing(self, error)
             default: throw error
             }
         }

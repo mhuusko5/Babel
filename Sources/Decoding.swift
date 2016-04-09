@@ -2,6 +2,7 @@ public enum DecodingError: ErrorType {
     case OutOfBounds(index: Int, array: [Value])
     case MissingKey(key: String, dictionary: [String: Value])
     case TypeMismatch(expectedType: Any.Type, value: Value)
+    case InvalidData(data: Any)
 }
 
 public extension _ArrayType where Generator.Element == Value {
@@ -69,6 +70,7 @@ public extension Value {
         switch self {
         case let .Boolean(bool): return bool
         case let .String(string) where string == "true" || string == "false": return string == "true" ? true : false
+        case let .Double(double) where double == 1 || double == 0: return double == 1 ? true : false
         case let .Integer(int) where int == 1 || int == 0: return int == 1 ? true : false
         case let .Other(other) where other is Bool: return other as! Bool
         default: throw DecodingError.TypeMismatch(expectedType: Bool.self, value: self)
@@ -145,7 +147,7 @@ public extension Value {
     func asFloat() throws -> Float {
         switch self {
         case let .Integer(int): return Float(int)
-        case let .Double(double): return Float(double)
+        case let .Double(double) /*where double < Swift.Double(Float.max)*/: return Float(double)
         case let .Other(other) where other is Float: return other as! Float
         case let .String(string):
             if let float = Float(string) { return float }
