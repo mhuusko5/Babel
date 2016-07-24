@@ -116,6 +116,14 @@ extension Int64: Decodable {
     public static func _decode(value: Value) throws -> Int64 { return try value.asInt64() }
 }
 
+extension UInt: Decodable {
+    public static func _decode(value: Value) throws -> UInt { return try value.asUInt() }
+}
+
+extension UInt64: Decodable {
+    public static func _decode(value: Value) throws -> UInt64 { return try value.asUInt64() }
+}
+
 extension Character: Decodable {
     public static func _decode(value: Value) throws -> Character { return try value.asCharacter() }
 }

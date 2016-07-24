@@ -72,7 +72,7 @@ public extension Value {
         case let .String(string) where string == "true" || string == "false": return string == "true" ? true : false
         case let .Double(double) where double == 1 || double == 0: return double == 1 ? true : false
         case let .Integer(int) where int == 1 || int == 0: return int == 1 ? true : false
-        case let .Other(other) where other is Bool: return other as! Bool
+        case let .Other(other as Bool): return other
         default: throw DecodingError.TypeMismatch(expectedType: Bool.self, value: self)
         }
     }
@@ -81,7 +81,7 @@ public extension Value {
         switch self {
         case let .Integer(int): return int
         case let .Double(double) where double < Swift.Double(Int.max): return Int(double)
-        case let .Other(other) where other is Int: return other as! Int
+        case let .Other(other as Int): return other
         case let .String(string):
             if let int = Int(string) { return int }
             else { fallthrough }
@@ -93,7 +93,7 @@ public extension Value {
         switch self {
         case let .Double(double): return double
         case let .Integer(int): return Swift.Double(int)
-        case let .Other(other) where other is Swift.Double: return other as! Swift.Double
+        case let .Other(other as Swift.Double): return other
         case let .String(string):
             if let double = Swift.Double(string) { return double }
             else { fallthrough }
@@ -107,7 +107,7 @@ public extension Value {
         case let .Boolean(bool): return "\(bool)"
         case let .Integer(int): return "\(int)"
         case let .Double(double): return "\(double)"
-        case let .Other(other) where other is Swift.String: return other as! Swift.String
+        case let .Other(other as Swift.String): return other
         default: throw DecodingError.TypeMismatch(expectedType: Swift.String.self, value: self)
         }
     }
@@ -117,7 +117,7 @@ public extension Value {
     func asArray() throws -> [Value] {
         switch self {
         case let .Array(array): return array
-        case let .Other(other) where other is _Array: return other as! _Array
+        case let .Other(other as _Array): return other
         default: throw DecodingError.TypeMismatch(expectedType: _Array.self, value: self)
         }
     }
@@ -127,7 +127,7 @@ public extension Value {
     func asDictionary() throws -> [Swift.String: Value] {
         switch self {
         case let .Dictionary(dictionary): return dictionary
-        case let .Other(other) where other is _Dictionary: return other as! _Dictionary
+        case let .Other(other as _Dictionary): return other
         default: throw DecodingError.TypeMismatch(expectedType: _Dictionary.self, value: self)
         }
     }
@@ -148,7 +148,7 @@ public extension Value {
         switch self {
         case let .Integer(int): return Float(int)
         case let .Double(double) /*where double < Swift.Double(Float.max)*/: return Float(double)
-        case let .Other(other) where other is Float: return other as! Float
+        case let .Other(other as Float): return other
         case let .String(string):
             if let float = Float(string) { return float }
             else { fallthrough }
@@ -160,11 +160,35 @@ public extension Value {
         switch self {
         case let .Integer(int): return Int64(int)
         case let .Double(double) where double < Swift.Double(Int64.max): return Int64(double)
-        case let .Other(other) where other is Int64: return other as! Int64
+        case let .Other(other as Int64): return other
         case let .String(string):
             if let int64 = Int64(string) { return int64 }
             else { fallthrough }
         default: throw DecodingError.TypeMismatch(expectedType: Int64.self, value: self)
+        }
+    }
+
+    func asUInt() throws -> UInt {
+        switch self {
+        case let .Integer(int) where int >= 0: return UInt(int)
+        case let .Double(double) where double >= 0 && double < Swift.Double(UInt.max): return UInt(double)
+        case let .Other(other as UInt): return other
+        case let .String(string):
+            if let uint = UInt(string) { return uint }
+            else { fallthrough }
+        default: throw DecodingError.TypeMismatch(expectedType: UInt.self, value: self)
+        }
+    }
+
+    func asUInt64() throws -> UInt64 {
+        switch self {
+        case let .Integer(int) where int >= 0: return UInt64(int)
+        case let .Double(double) where double >= 0 && double < Swift.Double(UInt64.max): return UInt64(double)
+        case let .Other(other as UInt64): return other
+        case let .String(string):
+            if let uint64 = UInt64(string) { return uint64 }
+            else { fallthrough }
+        default: throw DecodingError.TypeMismatch(expectedType: UInt64.self, value: self)
         }
     }
     

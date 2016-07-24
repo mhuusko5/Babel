@@ -145,9 +145,16 @@ public extension Value {
         case let int64 as Int64:
             if int64 < Int64(Int.max) { self = .Integer(Int(int64)) }
             else { self = .Double(Swift.Double(int64)) }
+        case let uint as UInt:
+            if uint < UInt(Int.max) { self = .Integer(Int(uint)) }
+            else { self = .Double(Swift.Double(uint)) }
+        case let uint64 as UInt64:
+            if uint64 < UInt64(Int.max) { self = .Integer(Int(uint64)) }
+            else { self = .Double(Swift.Double(uint64)) }
         case let double as Swift.Double: self = .Double(double)
         case let float as Float: self = .Double(Swift.Double(float))
         case let string as Swift.String: self = .String(string)
+        case let character as Character: self = .String(Swift.String(character))
         default:
             if let dictionary = castDictionary(native) {
                 self = .Dictionary(dictionary.dictMap { ($0, Value(native: $1)) })
