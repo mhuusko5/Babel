@@ -1,45 +1,47 @@
 public extension Value {
-    init(JSON: Swift.String) throws {
+    init(JSON: String) throws {
         do {
             self = try JSONParser.parse(JSON)
         } catch _ {
-            throw DecodingError.InvalidData(data: JSON)
+            throw DecodingError.invalidData(data: JSON)
         }
     }
     
-    init(JSON: Swift.String.UnicodeScalarView) throws {
+    init(JSON: String.UnicodeScalarView) throws {
         do {
             self = try JSONParser.parse(JSON)
         } catch _ {
-            throw DecodingError.InvalidData(data: JSON)
+            throw DecodingError.invalidData(data: JSON)
         }
     }
 }
 
 private class JSONParser {
-    enum Error: ErrorType {
-        case Unknown
-        case EmptyInput
-        case UnexpectedCharacter(lineNumber: UInt, characterNumber: UInt)
-        case UnterminatedString
-        case InvalidUnicode
-        case UnexpectedKeyword(lineNumber: UInt, characterNumber: UInt)
-        case InvalidNumber(lineNumber: UInt, characterNumber: UInt)
-        case EndOfFile
+    enum Error: Swift.Error {
+        typealias RawValue = UInt
+
+        case unknown
+        case emptyInput
+        case unexpectedCharacter(lineNumber: UInt, characterNumber: UInt)
+        case unterminatedString
+        case invalidUnicode
+        case unexpectedKeyword(lineNumber: UInt, characterNumber: UInt)
+        case invalidNumber(lineNumber: UInt, characterNumber: UInt)
+        case endOfFile
     }
     
-    class func parse(data: String.UnicodeScalarView) throws -> Value {
+    class func parse(_ data: String.UnicodeScalarView) throws -> Value {
         let parser = JSONParser(data: data)
         return try parser.parse()
     }
     
-    class func parse(string: String) throws -> Value {
+    class func parse(_ string: String) throws -> Value {
         let parser = JSONParser(data: string.unicodeScalars)
         return try parser.parse()
     }
     
     init(data: String.UnicodeScalarView) {
-        generator = data.generate()
+        generator = data.makeIterator()
         self.data = data
     }
 
@@ -54,20 +56,20 @@ private class JSONParser {
                     // Skip to EOF or the next token
                     try skipToNextToken()
                     // If we get this far some token was found ...
-                    throw Error.UnexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
+                    throw Error.unexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
                 } else {
                     // There's some weird character at the end of the file...
-                    throw Error.UnexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
+                    throw Error.unexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
                 }
-            } catch Error.EndOfFile {
+            } catch Error.endOfFile {
                 return value
             }
-        } catch Error.EndOfFile {
-            throw Error.EmptyInput
+        } catch Error.endOfFile {
+            throw Error.emptyInput
         }
     }
 
-    var generator: String.UnicodeScalarView.Generator
+    var generator: String.UnicodeScalarView.Iterator
     let data: String.UnicodeScalarView
     var scalar: UnicodeScalar!
     var lineNumber: UInt = 0
@@ -83,14 +85,14 @@ private class JSONParser {
                 crlfHack = false
             }
         } else {
-            throw Error.EndOfFile
+            throw Error.endOfFile
         }
     }
 
     func skipToNextToken() throws {
         var v = scalar.value
         if v != 0x0009 && v != 0x000A && v != 0x000D && v != 0x0020 {
-            throw Error.UnexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
+            throw Error.unexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
         }
 
         while v == 0x0009 || v == 0x000A || v == 0x000D || v == 0x0020 {
@@ -111,7 +113,7 @@ private class JSONParser {
         }
     }
 
-    func nextScalars(count: UInt) throws -> [UnicodeScalar] {
+    func nextScalars(_ count: UInt) throws -> [UnicodeScalar] {
         var values = [UnicodeScalar]()
         values.reserveCapacity(Int(count))
         for _ in 0..<count {
@@ -140,19 +142,19 @@ private class JSONParser {
         case "0".unicodeScalars.first!..."9".unicodeScalars.first!,negativeScalar,decimalScalar:
             return try nextNumber()
         default:
-            throw Error.UnexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
+            throw Error.unexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
         }
     }
 
     func nextObject() throws -> Value {
         if scalar != leftCurlyBracket {
-            throw Error.UnexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
+            throw Error.unexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
         }
         var dictBuilder = [String: Value]()
         try nextScalar()
         if scalar == rightCurlyBracket {
             // Empty object
-            return Value.Dictionary(dictBuilder)
+            return Value.dictionary(dictBuilder)
         }
         outerLoop: repeat {
             var v = scalar.value
@@ -166,13 +168,13 @@ private class JSONParser {
                 try skipToNextToken()
             }
             if scalar != colon {
-                throw Error.UnexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
+                throw Error.unexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
             }
             try nextScalar() // Skip the ':'
             let value = try nextValue()
             switch value {
             // Skip the closing character for all values except number, which doesn't have one
-            case .Integer, .Double:
+            case .integer, .double:
                 break
             default:
                 try nextScalar()
@@ -181,7 +183,7 @@ private class JSONParser {
             if v == 0x0009 || v == 0x000A || v == 0x000D || v == 0x0020 {
                 try skipToNextToken()
             }
-            guard case .String(let key) = string else { throw Error.Unknown }
+            guard case .string(let key) = string else { throw Error.unknown }
             //let key = string.string! // We're pretty confident it's a string since we called nextString() above
             dictBuilder[key] = value
             switch scalar {
@@ -190,16 +192,16 @@ private class JSONParser {
             case comma:
                 try nextScalar()
             default:
-                throw Error.UnexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
+                throw Error.unexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
             }
 
         } while true
-        return Value.Dictionary(dictBuilder)
+        return Value.dictionary(dictBuilder)
     }
 
     func nextArray() throws -> Value {
         if scalar != leftSquareBracket {
-            throw Error.UnexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
+            throw Error.unexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
         }
         var arrBuilder = [Value]()
         try nextScalar()
@@ -209,14 +211,14 @@ private class JSONParser {
         }
         if scalar == rightSquareBracket {
             // Empty array
-            return Value.Array(arrBuilder)
+            return Value.array(arrBuilder)
         }
         outerLoop: repeat {
             let value = try nextValue()
             arrBuilder.append(value)
             switch value {
             // Skip the closing character for all values except number, which doesn't have one
-            case .Integer, .Double:
+            case .integer, .double:
                 break
             default:
                 try nextScalar()
@@ -231,16 +233,16 @@ private class JSONParser {
             case comma:
                 try nextScalar()
             default:
-                throw Error.UnexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
+                throw Error.unexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
             }
         } while true
 
-        return Value.Array(arrBuilder)
+        return Value.array(arrBuilder)
     }
 
     func nextString() throws -> Value {
         if scalar != quotationMark {
-            throw Error.UnexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
+            throw Error.unexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
         }
         try nextScalar() // Skip pas the quotation character
         var strBuilder = ""
@@ -252,13 +254,13 @@ private class JSONParser {
                 // Escape character
                 if escaping {
                     // Escaping the escape char
-                    strBuilder.append(reverseSolidus)
+                    strBuilder.append(String(describing: reverseSolidus))
                 }
                 escaping = !escaping
                 try nextScalar()
             case quotationMark:
                 if escaping {
-                    strBuilder.append(quotationMark)
+                    strBuilder.append(String(describing: quotationMark))
                     escaping = false
                     try nextScalar()
                 } else {
@@ -269,27 +271,27 @@ private class JSONParser {
                 if escaping {
                     // Handle all the different escape characters
                     if let s = escapeMap[scalar] {
-                        strBuilder.append(s)
+                        strBuilder.append(String(describing: s))
                         try nextScalar()
                     } else if scalar == "u".unicodeScalars.first! {
                         let escapedUnicodeValue = try nextUnicodeEscape()
-                        strBuilder.append(UnicodeScalar(escapedUnicodeValue))
+                        strBuilder.append(String(describing: UnicodeScalar(escapedUnicodeValue)))
                         try nextScalar()
                     }
                     escaping = false
                 } else {
                     // Simple append
-                    strBuilder.append(scalar)
+                    strBuilder.append(String(scalar))
                     try nextScalar()
                 }
             }
         } while true
-        return Value.String(strBuilder)
+        return Value.string(strBuilder)
     }
 
     func nextUnicodeEscape() throws -> UInt32 {
         if scalar != "u".unicodeScalars.first! {
-            throw Error.UnexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
+            throw Error.unexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
         }
         var readScalar = UInt32(0)
         for _ in 0...3 {
@@ -308,24 +310,24 @@ private class JSONParser {
                 let hexScalarVal = hexVal + 10
                 readScalar = readScalar + hexScalarVal
             } else {
-                throw Error.UnexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
+                throw Error.unexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
             }
         }
         if readScalar >= 0xD800 && readScalar <= 0xDBFF {
             do {
                 try nextScalar()
                 if scalar != reverseSolidus {
-                    throw Error.InvalidUnicode
+                    throw Error.invalidUnicode
                 }
                 try nextScalar()
                 let secondScalar = try nextUnicodeEscape()
                 if secondScalar < 0xDC00 || secondScalar > 0xDFFF {
-                    throw Error.InvalidUnicode
+                    throw Error.invalidUnicode
                 }
                 let actualScalar = ((readScalar - 0xD800) * 0x400) + ((secondScalar - 0xDC00) + 0x10000)
                 return actualScalar
-            } catch Error.UnexpectedCharacter {
-                throw Error.InvalidUnicode
+            } catch Error.unexpectedCharacter {
+                throw Error.invalidUnicode
             }
         }
         return readScalar
@@ -360,21 +362,21 @@ private class JSONParser {
                     try nextScalar()
                 case negativeScalar:
                     if hasDigits || hasDecimal || hasDigits || isNegative {
-                        throw Error.UnexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
+                        throw Error.unexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
                     } else {
                         isNegative = true
                     }
                     try nextScalar()
                 case decimalScalar:
                     if hasDecimal {
-                        throw Error.UnexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
+                        throw Error.unexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
                     } else {
                         hasDecimal = true
                     }
                     try nextScalar()
                 case "e".unicodeScalars.first!,"E".unicodeScalars.first!:
                     if hasExponent {
-                        throw Error.UnexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
+                        throw Error.unexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
                     } else {
                         hasExponent = true
                     }
@@ -389,7 +391,7 @@ private class JSONParser {
                         positiveExponent = false
                         try nextScalar()
                     default:
-                        throw Error.UnexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
+                        throw Error.unexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
                     }
                     exponentLoop: repeat {
                         if scalar.value >= zeroScalar.value && scalar.value <= "9".unicodeScalars.first!.value {
@@ -404,12 +406,12 @@ private class JSONParser {
                     break outerLoop
                 }
             } while true
-        } catch Error.EndOfFile {
+        } catch Error.endOfFile {
             // This is fine
         }
 
         if !hasDigits {
-            throw Error.UnexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
+            throw Error.unexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
         }
 
         let sign = isNegative ? -1: 1
@@ -427,12 +429,12 @@ private class JSONParser {
                     }
                 }
             }
-            return Value.Double(number)
+            return Value.double(number)
         } else {
             var number: Int64
             if isNegative {
                 if integer > UInt64(Int64.max) + 1 {
-                    throw Error.InvalidNumber(lineNumber: lineNumAtStart, characterNumber: charNumAtStart)
+                    throw Error.invalidNumber(lineNumber: lineNumAtStart, characterNumber: charNumAtStart)
                 } else if integer == UInt64(Int64.max) + 1 {
                     number = Int64.min
                 } else {
@@ -440,16 +442,16 @@ private class JSONParser {
                 }
             } else {
                 if integer > UInt64(Int64.max) {
-                    throw Error.InvalidNumber(lineNumber: lineNumAtStart, characterNumber: charNumAtStart)
+                    throw Error.invalidNumber(lineNumber: lineNumAtStart, characterNumber: charNumAtStart)
                 } else {
                     number = Int64(integer)
                 }
             }
             
             if number < Int64(Int.max) {
-                return Value.Integer(Int(number))
+                return Value.integer(Int(number))
             } else {
-                return Value.Double(Double(number))
+                return Value.double(Double(number))
             }
         }
     }
@@ -466,47 +468,47 @@ private class JSONParser {
             expectedWord = falseToken
             expectedBool = false
         } else {
-            throw Error.UnexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
+            throw Error.unexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
         }
         do {
             let word = try [scalar] + nextScalars(UInt(expectedWord.count - 1))
             if word != expectedWord {
-                throw Error.UnexpectedKeyword(lineNumber: lineNumAtStart, characterNumber: charNumAtStart)
+                throw Error.unexpectedKeyword(lineNumber: lineNumAtStart, characterNumber: charNumAtStart)
             }
-        } catch Error.EndOfFile {
-            throw Error.UnexpectedKeyword(lineNumber: lineNumAtStart, characterNumber: charNumAtStart)
+        } catch Error.endOfFile {
+            throw Error.unexpectedKeyword(lineNumber: lineNumAtStart, characterNumber: charNumAtStart)
         }
-        return Value.Boolean(expectedBool)
+        return Value.boolean(expectedBool)
     }
 
     func nextNull() throws -> Value {
         let word = try [scalar] + nextScalars(3)
         if word != nullToken {
-            throw Error.UnexpectedKeyword(lineNumber: lineNumber, characterNumber: charNumber-4)
+            throw Error.unexpectedKeyword(lineNumber: lineNumber, characterNumber: charNumber-4)
         }
-        return Value.Null
+        return Value.null
     }
 }
 
-private let leftSquareBracket = UnicodeScalar(0x005b)
-private let leftCurlyBracket = UnicodeScalar(0x007b)
-private let rightSquareBracket = UnicodeScalar(0x005d)
-private let rightCurlyBracket = UnicodeScalar(0x007d)
-private let colon = UnicodeScalar(0x003A)
-private let comma = UnicodeScalar(0x002C)
+private let leftSquareBracket = UnicodeScalar(0x005b)!
+private let leftCurlyBracket = UnicodeScalar(0x007b)!
+private let rightSquareBracket = UnicodeScalar(0x005d)!
+private let rightCurlyBracket = UnicodeScalar(0x007d)!
+private let colon = UnicodeScalar(0x003A)!
+private let comma = UnicodeScalar(0x002C)!
 private let zeroScalar = "0".unicodeScalars.first!
 private let negativeScalar = "-".unicodeScalars.first!
 private let plusScalar = "+".unicodeScalars.first!
 private let decimalScalar = ".".unicodeScalars.first!
-private let quotationMark = UnicodeScalar(0x0022)
-private let carriageReturn = UnicodeScalar(0x000D)
-private let lineFeed = UnicodeScalar(0x000A)
+private let quotationMark = UnicodeScalar(0x0022)!
+private let carriageReturn = UnicodeScalar(0x000D)!
+private let lineFeed = UnicodeScalar(0x000A)!
 
-private let reverseSolidus = UnicodeScalar(0x005C)
-private let solidus = UnicodeScalar(0x002F)
-private let backspace = UnicodeScalar(0x0008)
-private let formFeed = UnicodeScalar(0x000C)
-private let tabCharacter = UnicodeScalar(0x0009)
+private let reverseSolidus = UnicodeScalar(0x005C)!
+private let solidus = UnicodeScalar(0x002F)!
+private let backspace = UnicodeScalar(0x0008)!
+private let formFeed = UnicodeScalar(0x000C)!
+private let tabCharacter = UnicodeScalar(0x0009)!
 
 private let trueToken = [UnicodeScalar]("true".unicodeScalars)
 private let falseToken = [UnicodeScalar]("false".unicodeScalars)

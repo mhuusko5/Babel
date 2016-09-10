@@ -3,37 +3,37 @@ import Babel
 // ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
 
 enum DataExample {
-    case String
-    case Data
-    case Literal
-    case LiteralShort
-    case LiteralBadData
-    case NSObject
+    case string
+    case data
+    case literal
+    case literalShort
+    case literalBadData
+    case foundationObject
 }
 
-let dataExample = DataExample.NSObject
+let dataExample = DataExample.string
 
 enum DecodingExample {
-    case Operators
-    case FunctionInferred
-    case FunctionExplicit
-    case UnwrappingAndChecking
+    case operators
+    case functionInferred
+    case functionExplicit
+    case unwrappingAndChecking
 }
 
-let decodingExample = DecodingExample.Operators
+let decodingExample = DecodingExample.operators
 
 // ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
 
 let jsonString = "{\"apiVersion\":\"2.0\",\n \"data\":{\n    \"updated\":\"2010-01-07T19:58:42.949Z\",\n    \"totalItems\":800,\n    \"startIndex\":1,\n    \"itemsPerPage\":1,\n    \"items\":[\n        {\"id\":\"hYB0mn5zh2c\",\n         \"uploaded\":\"2007-06-05T22:07:03.000Z\",\n         \"updated\":\"2010-01-07T13:26:50.000Z\",\n         \"uploader\":\"GoogleDeveloperDay\",\n         \"category\":\"News\",\n         \"title\":\"Google Developers Day US - Maps API Introduction\",\n         \"description\":\"Google Maps API Introduction ...\",\n         \"tags\":[\n            \"GDD07\",\"GDD07US\",\"Maps\"\n         ],\n         \"thumbnail\":{\n            \"default\":\"http://i.ytimg.com/vi/hYB0mn5zh2c/default.jpg\",\n            \"hqDefault\":\"http://i.ytimg.com/vi/hYB0mn5zh2c/hqdefault.jpg\"\n         },\n         \"player\":{\n            \"default\":\"http://www.youtube.com/watch?vu003dhYB0mn5zh2c\"\n         },\n         \"content\":{\n            \"1\":\"rtsp://v5.cache3.c.youtube.com/CiILENy.../0/0/0/video.3gp\",\n            \"5\":\"http://www.youtube.com/v/hYB0mn5zh2c?f...\",\n            \"6\":\"rtsp://v1.cache1.c.youtube.com/CiILENy.../0/0/0/video.3gp\"\n         },\n         \"duration\":2840,\n         \"aspectRatio\":\"widescreen\",\n         \"rating\":4.63,\n         \"ratingCount\":68,\n         \"viewCount\":220101,\n         \"favoriteCount\":201,\n         \"commentCount\":22,\n         \"status\":{\n            \"value\":\"restricted\",\n            \"reason\":\"limitedSyndication\"\n         },\n         \"accessControl\":{\n            \"syndicate\":\"allowed\",\n            \"commentVote\":\"allowed\",\n            \"rate\":\"allowed\",\n            \"list\":\"allowed\",\n            \"comment\":\"allowed\",\n            \"embed\":\"allowed\",\n            \"videoRespond\":\"moderated\"\n         }\n        }\n    ]\n }\n}"
 
-let jsonData = jsonString.dataUsingEncoding(NSUTF8StringEncoding)!
+let jsonData = jsonString.data(using: .utf8)!
 
 let value: Value
 
 switch dataExample {
-case .String: value = try! Value(JSON: jsonString)
-case .Data: value = try! Value(JSON: jsonData)
-case .Literal:
+case .string: value = try! Value(JSON: jsonString)
+case .data: value = try! Value(JSON: jsonData)
+case .literal:
     value = [
         "apiVersion": "2.0",
         "data": [
@@ -62,7 +62,7 @@ case .Literal:
             "totalItems": 800
         ]
     ]
-case .LiteralShort:
+case .literalShort:
     value = [
         "apiVersion": "2.0",
         "data": [
@@ -70,7 +70,7 @@ case .LiteralShort:
             "totalItems": 0
         ]
     ]
-case .LiteralBadData:
+case .literalBadData:
     value = [
         "apiVersion": "2.0",
         "data": [
@@ -86,8 +86,8 @@ case .LiteralBadData:
             "totalItems": 800
         ]
     ]
-case .NSObject:
-    value = try! Value(NSObject: NSJSONSerialization.JSONObjectWithData(jsonData, options: .AllowFragments))
+case .foundationObject:
+    value = try! Value(foundation: JSONSerialization.jsonObject(with: jsonData, options: .allowFragments))
 }
 
 prettyPrint("Value: ", value)
@@ -100,27 +100,27 @@ public struct YouTubeResponse: Decodable {
     let apiVersion: Double
     let data: YouTubeData?
     
-    public static func _decode(value: Value) throws -> YouTubeResponse {
+    public static func _decode(_ value: Value) throws -> YouTubeResponse {
         switch decodingExample {
-        case .Operators:
+        case .operators:
             return try YouTubeResponse(
                 apiVersion: value => "apiVersion",
                 data: value =>? "data"
             )
             
-        case .FunctionInferred:
+        case .functionInferred:
             return try YouTubeResponse(
                 apiVersion: value.valueFor("apiVersion").decode(),
                 data: value.maybeValueFor("data")?.decode()
             )
             
-        case .FunctionExplicit:
+        case .functionExplicit:
             return try YouTubeResponse(
                 apiVersion: value.asDictionary().valueFor("apiVersion").asDouble(),
                 data: value.asDictionary().maybeValueFor("data", nilOnNull: true, throwOnMissing: true)?.decode(type: YouTubeData.self, ignoreFailure: false)
             )
             
-        case .UnwrappingAndChecking:
+        case .unwrappingAndChecking:
             let valueDictionary = try value.asDictionary()
             
             if let apiVersionString = valueDictionary["apiVersion"]?.stringValue,
@@ -132,10 +132,10 @@ public struct YouTubeResponse: Decodable {
                         return YouTubeResponse(apiVersion: apiVersion, data: try YouTubeData.decode(data))
                     }
                 } else {
-                    throw DecodingError.TypeMismatch(expectedType: YouTubeResponse.self, value: value)
+                    throw DecodingError.typeMismatch(expectedType: YouTubeResponse.self, value: value)
                 }
             } else {
-                throw DecodingError.TypeMismatch(expectedType: YouTubeResponse.self, value: value)
+                throw DecodingError.typeMismatch(expectedType: YouTubeResponse.self, value: value)
             }
         }
     }
@@ -146,30 +146,30 @@ public struct YouTubeData: Decodable {
     let firstItem: YouTubeDataItem?
     let items: [YouTubeDataItem]
     
-    public static func _decode(value: Value) throws -> YouTubeData {
+    public static func _decode(_ value: Value) throws -> YouTubeData {
         switch decodingExample {
-        case .Operators:
+        case .operators:
             return try YouTubeData(
                 totalItems: value => "totalItems",
                 firstItem: value => "items" =>?? 0,
                 items: value => "items"
             )
             
-        case .FunctionInferred:
+        case .functionInferred:
             return try YouTubeData(
                 totalItems: value.valueFor("totalItems").decode(),
                 firstItem: value.valueFor("items").maybeValueAt(0, throwOnMissing: false)?.decode(),
                 items: value.valueFor("items").decode()
             )
             
-        case .FunctionExplicit:
+        case .functionExplicit:
             return try YouTubeData(
                 totalItems: value.asDictionary().valueFor("totalItems").asInt(),
                 firstItem: value.asDictionary().valueFor("items").asArray().maybeValueAt(0, nilOnNull: true, throwOnMissing: false)?.decode(type: YouTubeDataItem.self, ignoreFailure: false),
                 items: value.asDictionary().valueFor("items").asArray().decode(type: YouTubeDataItem.self, ignoreFailures: false)
             )
             
-        case .UnwrappingAndChecking:
+        case .unwrappingAndChecking:
             let valueDictionary = try value.asDictionary()
             
             if let totalItems = valueDictionary["totalItems"]?.intValue,
@@ -188,7 +188,7 @@ public struct YouTubeData: Decodable {
                     items: try items.map { try YouTubeDataItem.decode($0) }
                 )
             } else {
-                throw DecodingError.TypeMismatch(expectedType: YouTubeData.self, value: value)
+                throw DecodingError.typeMismatch(expectedType: YouTubeData.self, value: value)
             }
         }
     }
@@ -198,12 +198,12 @@ public struct YouTubeDataItem: Decodable {
     let title: String
     let favouriteCount: Int
     let rating: Int
-    let uploaded: NSDate
-    let content: [Int: NSURL]
+    let uploaded: Date
+    let content: [Int: URL]
     
-    public static func _decode(value: Value) throws -> YouTubeDataItem {
+    public static func _decode(_ value: Value) throws -> YouTubeDataItem {
         switch decodingExample {
-        case .Operators:
+        case .operators:
             return try YouTubeDataItem(
                 title: value => "title",
                 favouriteCount: value => "favoriteCount",
@@ -212,7 +212,7 @@ public struct YouTubeDataItem: Decodable {
                 content: value => "content"
             )
             
-        case .FunctionInferred:
+        case .functionInferred:
             return try YouTubeDataItem(
                 title: value.valueFor("title").decode(),
                 favouriteCount: value.valueFor("favoriteCount").decode(),
@@ -221,16 +221,16 @@ public struct YouTubeDataItem: Decodable {
                 content: value.valueFor("content").decode()
             )
             
-        case .FunctionExplicit:
+        case .functionExplicit:
             return try YouTubeDataItem(
                 title: value.asDictionary().valueFor("title").asString(),
                 favouriteCount: value.asDictionary().valueFor("favoriteCount").asInt(),
                 rating: value.asDictionary().valueFor("rating").asInt(),
-                uploaded: value.asDictionary().valueFor("uploaded").decode(type: NSDate.self),
-                content: value.asDictionary().valueFor("content").asDictionary().decode(keyType: Int.self, valueType: NSURL.self, ignoreFailures: false)
+                uploaded: value.asDictionary().valueFor("uploaded").decode(type: Date.self),
+                content: value.asDictionary().valueFor("content").asDictionary().decode(keyType: Int.self, valueType: URL.self, ignoreFailures: false)
             )
             
-        case .UnwrappingAndChecking:
+        case .unwrappingAndChecking:
             let valueDictionary = try value.asDictionary()
             
             if let title = valueDictionary["title"]?.stringValue,
@@ -238,20 +238,20 @@ public struct YouTubeDataItem: Decodable {
                let rating = valueDictionary["rating"]?.doubleValue.flatMap({ Int($0) }),
                let content = valueDictionary["content"]?.dictionaryValue {
                 
-                var decodedContent = [Int: NSURL]()
+                var decodedContent = [Int: URL]()
                 for (key, value) in content {
                     if let key = Int(key) {
-                        decodedContent[key] = try NSURL.decode(value)
+                        decodedContent[key] = try URL.decode(value)
                     } else {
-                        throw DecodingError.TypeMismatch(expectedType: YouTubeDataItem.self, value: value)
+                        throw DecodingError.typeMismatch(expectedType: YouTubeDataItem.self, value: value)
                     }
                 }
                 
-                let decodedUploaded: NSDate
-                if let uploaded = valueDictionary["uploaded"] where uploaded.isString {
-                    decodedUploaded = try NSDate.decode(uploaded)
+                let decodedUploaded: Date
+                if let uploaded = valueDictionary["uploaded"], uploaded.isString {
+                    decodedUploaded = try Date.decode(uploaded)
                 } else {
-                    throw DecodingError.TypeMismatch(expectedType: YouTubeDataItem.self, value: value)
+                    throw DecodingError.typeMismatch(expectedType: YouTubeDataItem.self, value: value)
                 }
                 
                 return YouTubeDataItem(
@@ -262,7 +262,7 @@ public struct YouTubeDataItem: Decodable {
                     content: decodedContent
                 )
             } else {
-                throw DecodingError.TypeMismatch(expectedType: YouTubeDataItem.self, value: value)
+                throw DecodingError.typeMismatch(expectedType: YouTubeDataItem.self, value: value)
             }
         }
     }
@@ -275,25 +275,28 @@ do {
 // ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
 
 do {
-    let content: [Int: NSURL]
+    let content: [Int: URL]
     
     switch decodingExample {
-    case .Operators:
+    case .operators:
         content = (try value =>? "data" => "items" =>?? 0 => "content") ?? [:]
         
-    case .FunctionInferred:
-        content = (try value.maybeValueFor("data")?.valueFor("items").maybeValueAt(0, throwOnMissing: false)?.valueFor("content").decode()) ?? [:]
+    case .functionInferred:
+        content = (try value.maybeValueFor("data")?
+                            .valueFor("items")
+                            .maybeValueAt(0, throwOnMissing: false)?
+                            .valueFor("content").decode()) ?? [:]
         
-    case .FunctionExplicit:
+    case .functionExplicit:
         content = try value.asDictionary()
                            .maybeValueFor("data", nilOnNull: true, throwOnMissing: true)?.asDictionary()
                            .valueFor("items").asArray()
                            .maybeValueAt(0, nilOnNull: true, throwOnMissing: false)?.asDictionary()
                            .valueFor("content").asDictionary()
-                           .decode(keyType: Int.self, valueType: NSURL.self, ignoreFailures: false) ?? [:]
+                           .decode(keyType: Int.self, valueType: URL.self, ignoreFailures: false) ?? [:]
         
-    case .UnwrappingAndChecking:
-        var decodedContent: [Int: NSURL]?
+    case .unwrappingAndChecking:
+        var decodedContent: [Int: URL]?
         
         if let valueDictionary = value.dictionaryValue {
             if let data = valueDictionary["data"] {
@@ -311,19 +314,20 @@ do {
                                         
                                         for (key, value) in contentDictionary {
                                             if let key = Int(key) {
-                                                if let string = value.stringValue, url = NSURL(string: string) {
+                                                if let string = value.stringValue,
+                                                    let url = URL(string: string) {
                                                     decodedContent![key] = url
-                                                } else { throw DecodingError.TypeMismatch(expectedType: NSURL.self, value: value) }
-                                            } else { throw DecodingError.TypeMismatch(expectedType: Int.self, value: .String(key)) }
+                                                } else { throw DecodingError.typeMismatch(expectedType: URL.self, value: value) }
+                                            } else { throw DecodingError.typeMismatch(expectedType: Int.self, value: .string(key)) }
                                         }
-                                    } else { throw DecodingError.TypeMismatch(expectedType: Dictionary<String, Value>.self, value: content) }
-                                } else { throw DecodingError.MissingKey(key: "content", dictionary: itemDictionary) }
+                                    } else { throw DecodingError.typeMismatch(expectedType: Dictionary<String, Value>.self, value: content) }
+                                } else { throw DecodingError.missingKey(key: "content", dictionary: itemDictionary) }
                             } else { decodedContent = nil }
-                        } else { throw DecodingError.TypeMismatch(expectedType: Array<Value>.self, value: items) }
-                    } else { throw DecodingError.MissingKey(key: "items", dictionary: dataDictionary) }
-                } else { throw DecodingError.TypeMismatch(expectedType: Dictionary<String, Value>.self, value: data) }
-            } else { throw DecodingError.MissingKey(key: "data", dictionary: valueDictionary) }
-        } else { throw DecodingError.TypeMismatch(expectedType: Dictionary<String, Value>.self, value: value) }
+                        } else { throw DecodingError.typeMismatch(expectedType: Array<Value>.self, value: items) }
+                    } else { throw DecodingError.missingKey(key: "items", dictionary: dataDictionary) }
+                } else { throw DecodingError.typeMismatch(expectedType: Dictionary<String, Value>.self, value: data) }
+            } else { throw DecodingError.missingKey(key: "data", dictionary: valueDictionary) }
+        } else { throw DecodingError.typeMismatch(expectedType: Dictionary<String, Value>.self, value: value) }
 
         content = decodedContent ?? [:]
     }

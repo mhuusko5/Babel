@@ -1,12 +1,12 @@
-public func prettyPrint(any: Any) {
+public func prettyPrint(_ any: Any) {
     print(prettyDescription(any), terminator: "\n\n")
 }
 
-public func prettyPrint(prepend: String, _ any: Any) {
+public func prettyPrint(_ prepend: String, _ any: Any) {
     print(prepend + prettyDescription(any), terminator: "\n\n")
 }
 
-public func prettyDescription(any: Any) -> String {
+public func prettyDescription(_ any: Any) -> String {
     guard let any = deepUnwrap(any) else {
 		return "nil"
 	}
@@ -27,30 +27,30 @@ public func prettyDescription(any: Any) -> String {
 		return "\"\(string)\""
 	}
     
-    func indentedString(string: String) -> String {
-        return string.characters.split("\r").map(String.init).map { $0.isEmpty ? "" : "\r    \($0)" }.joinWithSeparator("")
+    func indentedString(_ string: String) -> String {
+        return string.characters.split(separator: "\r").map(String.init).map { $0.isEmpty ? "" : "\r    \($0)" }.joined(separator: "")
     }
     
     let mirror = Mirror(reflecting: any)
     
     let properties = Array(mirror.children)
 
-    var typeName = String(mirror.subjectType)
+    var typeName = String(describing: mirror.subjectType)
     if typeName.hasSuffix(".Type") {
         typeName = ""
     } else { typeName = "<\(typeName)> " }
     
     guard let displayStyle = mirror.displayStyle else {
-        return "\(typeName)\(String(any))"
+        return "\(typeName)\(String(describing: any))"
     }
     
     switch displayStyle {
-    case .Tuple:
+    case .tuple:
         if properties.isEmpty { return "()" }
         
         var string = "("
         
-        for (index, property) in properties.enumerate() {
+        for (index, property) in properties.enumerated() {
             if property.label!.characters.first! == "." {
                 string += prettyDescription(property.value)
             } else {
@@ -61,34 +61,34 @@ public func prettyDescription(any: Any) -> String {
         }
         
         return string + ")"
-    case .Collection, .Set:
+    case .collection, .set:
         if properties.isEmpty { return "[]" }
         
         var string = "["
     
-        for (index, property) in properties.enumerate() {
+        for (index, property) in properties.enumerated() {
             string += indentedString(prettyDescription(property.value) + (index < properties.count - 1 ? ",\r" : ""))
         }
         
         return string + "\r]"
-    case .Dictionary:
+    case .dictionary:
         if properties.isEmpty { return "[:]" }
         
         var string = "["
         
-        for (index, property) in properties.enumerate() {
+        for (index, property) in properties.enumerated() {
             let pair = Array(Mirror(reflecting: property.value).children)
             
             string += indentedString("\(prettyDescription(pair[0].value)): \(prettyDescription(pair[1].value))" + (index < properties.count - 1 ? ",\r" : ""))
         }
         
         return string + "\r]"
-    case .Enum:
+    case .enum:
         if let any = any as? CustomDebugStringConvertible {
             return any.debugDescription
         }
         
-        if properties.isEmpty { return "\(mirror.subjectType)." + String(any) }
+        if properties.isEmpty { return "\(mirror.subjectType)." + String(describing: any) }
         
         var string = "\(mirror.subjectType).\(properties.first!.label!)"
         
@@ -101,32 +101,32 @@ public func prettyDescription(any: Any) -> String {
         }
         
         return string
-    case .Struct, .Class:
+    case .struct, .class:
         if let any = any as? CustomDebugStringConvertible {
             return any.debugDescription
         }
         
-        if properties.isEmpty { return "\(typeName)\(String(any))" }
+        if properties.isEmpty { return "\(typeName)\(String(describing: any))" }
         
         var string = "\(typeName){"
         
-        for (index, property) in properties.enumerate() {
+        for (index, property) in properties.enumerated() {
             string += indentedString("\(property.label!): \(prettyDescription(property.value))" + (index < properties.count - 1 ? ",\r" : ""))
         }
         
         return string + "\r}"
-    case .Optional: fatalError("deepUnwrap must have failed... (it doesn't)")
+    case .optional: fatalError("deepUnwrap must have failed... (it doesn't)")
     }
 }
 
-private func deepUnwrap(any: Any) -> Any? {
+private func deepUnwrap(_ any: Any) -> Any? {
 	let mirror = Mirror(reflecting: any)
 	
-	if mirror.displayStyle != .Optional {
+	if mirror.displayStyle != .optional {
 		return any
 	}
 	
-	if let child = mirror.children.first where child.label == "Some" {
+	if let child = mirror.children.first, child.label == "some" {
 		return deepUnwrap(child.value)
 	}
 	

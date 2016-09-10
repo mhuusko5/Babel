@@ -1,105 +1,105 @@
 public enum Value {
-    case Null
-    case Boolean(Bool)
-    case Integer(Int)
-    case Double(Swift.Double)
-    case String(Swift.String)
-    case Array([Value])
-    case Dictionary([Swift.String: Value])
-    case Other(Any)
+    case null
+    case boolean(Bool)
+    case integer(Int)
+    case double(Double)
+    case string(String)
+    case array([Value])
+    case dictionary([String: Value])
+    case other(Any)
 }
 
 public extension Value {
-    var isNull: Bool { return self == .Null }
+    var isNull: Bool { return self == .null }
     
     var isBoolean: Bool {
-        if case .Boolean = self { return true } else { return false }
+        if case .boolean = self { return true } else { return false }
     }
     
     var isInteger: Bool {
-        if case .Integer = self { return true } else { return false }
+        if case .integer = self { return true } else { return false }
     }
     
     var isDouble: Bool {
-        if case .Double = self { return true } else { return false }
+        if case .double = self { return true } else { return false }
     }
     
     var isString: Bool {
-        if case .String = self { return true } else { return false }
+        if case .string = self { return true } else { return false }
     }
     
     var isArray: Bool {
-        if case .Array = self { return true } else { return false }
+        if case .array = self { return true } else { return false }
     }
     
     var isDictionary: Bool {
-        if case .Dictionary = self { return true } else { return false }
+        if case .dictionary = self { return true } else { return false }
     }
     
     var isOther: Bool {
-        if case .Other = self { return true } else { return false }
+        if case .other = self { return true } else { return false }
     }
 }
 
 public extension Value {
     var boolValue: Bool? {
-        if case let .Boolean(bool) = self { return bool }
+        if case let .boolean(bool) = self { return bool }
         else { return nil }
     }
     
     var intValue: Int? {
-        if case let .Integer(int) = self { return int }
+        if case let .integer(int) = self { return int }
         else { return nil }
     }
     
-    var doubleValue: Swift.Double? {
-        if case let .Double(double) = self { return double }
+    var doubleValue: Double? {
+        if case let .double(double) = self { return double }
         else { return nil }
     }
     
-    var stringValue: Swift.String? {
-        if case let .String(string) = self { return string }
+    var stringValue: String? {
+        if case let .string(string) = self { return string }
         else { return nil }
     }
     
     var arrayValue: [Value]? {
-        if case let .Array(array) = self { return array }
+        if case let .array(array) = self { return array }
         else { return nil }
     }
     
-    var dictionaryValue: [Swift.String: Value]? {
-        if case let .Dictionary(dictionary) = self { return dictionary }
+    var dictionaryValue: [String: Value]? {
+        if case let .dictionary(dictionary) = self { return dictionary }
         else { return nil }
     }
     
     var otherValue: Any? {
-        if case let .Other(other) = self { return other }
+        if case let .other(other) = self { return other }
         else { return nil }
     }
     
     var nativeValue: Any? {
         switch self {
-        case .Null: return nil
-        case let .Boolean(bool): return bool
-        case let .Integer(int): return int
-        case let .Double(double): return double
-        case let .String(string): return string
-        case let .Array(array): return array.map { $0.nativeValue }
-        case let .Dictionary(dictionary): return dictionary.dictMap { ($0, $1.nativeValue) }
-        case let .Other(other): return other
+        case .null: return nil
+        case let .boolean(bool): return bool
+        case let .integer(int): return int
+        case let .double(double): return double
+        case let .string(string): return string
+        case let .array(array): return array.map { $0.nativeValue }
+        case let .dictionary(dictionary): return dictionary.dictMap { ($0, $1.nativeValue) }
+        case let .other(other): return other
         }
     }
 }
 
 public extension Value {
     subscript(index: Int) -> Value? {
-        if case let .Array(array) = self where index < array.count {
+        if case let .array(array) = self, index < array.count {
             return array[index]
         } else { return nil }
     }
     
-    subscript(key: Swift.String) -> Value? {
-        if case let .Dictionary(dictionary) = self {
+    subscript(key: String) -> Value? {
+        if case let .dictionary(dictionary) = self {
             return dictionary[key]
         } else { return nil }
     }
@@ -109,99 +109,99 @@ extension Value: Equatable {}
 
 public func ==(lhs: Value, rhs: Value) -> Bool {
     switch (lhs, rhs) {
-    case (.Null, .Null): return true
-    case let (.Boolean(lhs), .Boolean(rhs)): return lhs == rhs
-    case let (.Integer(lhs), .Integer(rhs)): return lhs == rhs
-    case let (.Double(lhs), .Double(rhs)): return lhs == rhs
-    case let (.String(lhs), .String(rhs)): return lhs == rhs
-    case let (.Array(lhs), .Array(rhs)): return lhs == rhs
-    case let (.Dictionary(lhs), .Dictionary(rhs)): return lhs == rhs
+    case (.null, .null): return true
+    case let (.boolean(lhs), .boolean(rhs)): return lhs == rhs
+    case let (.integer(lhs), .integer(rhs)): return lhs == rhs
+    case let (.double(lhs), .double(rhs)): return lhs == rhs
+    case let (.string(lhs), .string(rhs)): return lhs == rhs
+    case let (.array(lhs), .array(rhs)): return lhs == rhs
+    case let (.dictionary(lhs), .dictionary(rhs)): return lhs == rhs
     default: return false
     }
 }
 
 public extension Value {
-    init(_ bool: Bool) { self = .Boolean(bool) }
+    init(_ bool: Bool) { self = .boolean(bool) }
     
-    init(_ int: Int) { self = .Integer(int) }
+    init(_ int: Int) { self = .integer(int) }
     
-    init(_ double: Swift.Double) { self = .Double(double) }
+    init(_ double: Double) { self = .double(double) }
     
-    init(_ string: Swift.String) { self = .String(string) }
+    init(_ string: String) { self = .string(string) }
     
-    init(_ array: [Value]) { self = .Array(array) }
+    init(_ array: [Value]) { self = .array(array) }
     
-    init(_ dictionary: [Swift.String: Value]) { self = .Dictionary(dictionary) }
+    init(_ dictionary: [String: Value]) { self = .dictionary(dictionary) }
     
-    init(other: Any) { self = .Other(other) }
+    init(other: Any) { self = .other(other) }
 }
 
 public extension Value {
-    init(native: Any?) {
-        switch native {
-        case nil: self = .Null
-        case let bool as Bool: self = .Boolean(bool)
-        case let int as Int: self = .Integer(int)
+    init(native value: Any?) {
+        switch value {
+        case nil: self = .null
+        case let bool as Bool: self = .boolean(bool)
+        case let int as Int: self = .integer(int)
         case let int64 as Int64:
-            if int64 < Int64(Int.max) { self = .Integer(Int(int64)) }
-            else { self = .Double(Swift.Double(int64)) }
+            if int64 < Int64(Int.max) { self = .integer(Int(int64)) }
+            else { self = .double(Double(int64)) }
         case let uint as UInt:
-            if uint < UInt(Int.max) { self = .Integer(Int(uint)) }
-            else { self = .Double(Swift.Double(uint)) }
+            if uint < UInt(Int.max) { self = .integer(Int(uint)) }
+            else { self = .double(Double(uint)) }
         case let uint64 as UInt64:
-            if uint64 < UInt64(Int.max) { self = .Integer(Int(uint64)) }
-            else { self = .Double(Swift.Double(uint64)) }
-        case let double as Swift.Double: self = .Double(double)
-        case let float as Float: self = .Double(Swift.Double(float))
-        case let string as Swift.String: self = .String(string)
-        case let character as Character: self = .String(Swift.String(character))
+            if uint64 < UInt64(Int.max) { self = .integer(Int(uint64)) }
+            else { self = .double(Double(uint64)) }
+        case let double as Double: self = .double(double)
+        case let float as Float: self = .double(Double(float))
+        case let string as String: self = .string(string)
+        case let character as Character: self = .string(String(character))
         default:
-            if let dictionary = castDictionary(native) {
-                self = .Dictionary(dictionary.dictMap { ($0, Value(native: $1)) })
-            } else if let array = castArray(native) {
-                self = .Array(array.map { Value(native: $0) })
+            if let dictionary = castDictionary(value) {
+                self = .dictionary(dictionary.dictMap { ($0, Value(native: $1)) })
+            } else if let array = castArray(value) {
+                self = .array(array.map { Value(native: $0) })
             } else {
-                self = .Other(native)
+                self = .other(value)
             }
         }
     }
 }
 
-extension Value: NilLiteralConvertible {
-    public init(nilLiteral value: Void) { self = .Null }
+extension Value: ExpressibleByNilLiteral {
+    public init(nilLiteral value: Void) { self = .null }
 }
 
-extension Value: BooleanLiteralConvertible {
-    public init(booleanLiteral value: BooleanLiteralType) { self = .Boolean(value) }
+extension Value: ExpressibleByBooleanLiteral {
+    public init(booleanLiteral value: BooleanLiteralType) { self = .boolean(value) }
 }
 
-extension Value: IntegerLiteralConvertible {
-    public init(integerLiteral value: IntegerLiteralType) { self = .Integer(value) }
+extension Value: ExpressibleByIntegerLiteral {
+    public init(integerLiteral value: IntegerLiteralType) { self = .integer(value) }
 }
 
-extension Value: FloatLiteralConvertible {
-    public init(floatLiteral value: FloatLiteralType) { self = .Double(Swift.Double(value)) }
+extension Value: ExpressibleByFloatLiteral {
+    public init(floatLiteral value: FloatLiteralType) { self = .double(Double(value)) }
 }
 
-extension Value: StringLiteralConvertible {
-    public typealias UnicodeScalarLiteralType = Swift.String
+extension Value: ExpressibleByStringLiteral {
+    public typealias UnicodeScalarLiteralType = String
 
-    public init(unicodeScalarLiteral value: UnicodeScalarLiteralType) { self = .String(value) }
+    public init(unicodeScalarLiteral value: UnicodeScalarLiteralType) { self = .string(value) }
     
-    public typealias ExtendedGraphemeClusterLiteralType = Swift.String
+    public typealias ExtendedGraphemeClusterLiteralType = String
     
-    public init(extendedGraphemeClusterLiteral value: ExtendedGraphemeClusterType) { self = .String(value) }
+    public init(extendedGraphemeClusterLiteral value: ExtendedGraphemeClusterType) { self = .string(value) }
     
-    public init(stringLiteral value: StringLiteralType) { self = .String(value) }
+    public init(stringLiteral value: StringLiteralType) { self = .string(value) }
 }
 
-extension Value: ArrayLiteralConvertible {
-    public init(arrayLiteral elements: Value...) { self = .Array(elements) }
+extension Value: ExpressibleByArrayLiteral {
+    public init(arrayLiteral elements: Value...) { self = .array(elements) }
 }
 
-extension Value: DictionaryLiteralConvertible {
+extension Value: ExpressibleByDictionaryLiteral {
     public init(dictionaryLiteral elements: (StringLiteralType, Value)...) {
-        self = .Dictionary([StringLiteralType: Value](elements))
+        self = .dictionary([StringLiteralType: Value](elements))
     }
 }
 
@@ -214,15 +214,15 @@ private extension Dictionary {
         for (key, value) in elements { self[key] = value }
     }
     
-    func dictMap<K, V>(@noescape transform: (Key, Value) throws -> (K, V)) rethrows -> [K: V] {
+    func dictMap<K, V>(_ transform: (Key, Value) throws -> (K, V)) rethrows -> [K: V] {
         return try [K: V](map(transform))
     }
 }
 
-private func castDictionary(any: Any) -> [String: Any]? {
+private func castDictionary(_ any: Any) -> [String: Any]? {
     let mirror = Mirror(reflecting: any)
     
-    guard let displayStyle = mirror.displayStyle where displayStyle == .Dictionary else {
+    guard let displayStyle = mirror.displayStyle, displayStyle == .dictionary else {
         return nil
     }
     
@@ -241,10 +241,10 @@ private func castDictionary(any: Any) -> [String: Any]? {
     return dictionary
 }
 
-private func castArray(any: Any) -> [Any]? {
+private func castArray(_ any: Any) -> [Any]? {
     let mirror = Mirror(reflecting: any)
     
-    if let displayStyle = mirror.displayStyle where displayStyle == .Collection || displayStyle == .Set {
+    if let displayStyle = mirror.displayStyle, displayStyle == .collection || displayStyle == .set {
         return Array(mirror.children).map { $0.value }
     }
     
