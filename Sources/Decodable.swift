@@ -50,7 +50,12 @@ public extension _ArrayProtocol where Iterator.Element == Value {
 }
 
 public extension Collection where Iterator.Element == (key: String, value: Value) {
-    func decode<K: Decodable, V: Decodable>(keyType: K.Type = K.self, valueType: V.Type = V.self, ignoreFailures: Bool = false) throws -> [K: V] {
+    func decode<K: Decodable, V: Decodable>(
+        keyType: K.Type = K.self,
+        valueType: V.Type = V.self,
+        ignoreFailures: Bool = false
+    ) throws -> [K: V] {
+
         var dictionary = [K: V]()
         
         for (key, value) in self {
@@ -87,7 +92,12 @@ public extension Value {
         return try asArray().decode(ignoreFailures: ignoreFailures)
     }
     
-    func decode<K: Decodable, V: Decodable>(keyType: K.Type = K.self, valueType: V.Type = V.self, ignoreFailures: Bool = false) throws -> [K: V] {
+    func decode<K: Decodable, V: Decodable>(
+        keyType: K.Type = K.self,
+        valueType: V.Type = V.self,
+        ignoreFailures: Bool = false
+    ) throws -> [K: V] {
+
         return try asDictionary().decode(ignoreFailures: ignoreFailures)
     }
 }
