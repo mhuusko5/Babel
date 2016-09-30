@@ -1,7 +1,7 @@
 public extension Value {
     init(JSON: String) throws {
         do {
-            self = try JSONParser.parse(JSON)
+            self = try JSONParser.parse(string: JSON)
         } catch _ {
             throw DecodingError.invalidData(data: JSON)
         }
@@ -9,7 +9,7 @@ public extension Value {
     
     init(JSON: String.UnicodeScalarView) throws {
         do {
-            self = try JSONParser.parse(JSON)
+            self = try JSONParser.parse(scalars: JSON)
         } catch _ {
             throw DecodingError.invalidData(data: JSON)
         }
@@ -18,8 +18,6 @@ public extension Value {
 
 private class JSONParser {
     enum Error: Swift.Error {
-        typealias RawValue = UInt
-
         case unknown
         case emptyInput
         case unexpectedCharacter(lineNumber: UInt, characterNumber: UInt)
@@ -30,19 +28,19 @@ private class JSONParser {
         case endOfFile
     }
     
-    class func parse(_ data: String.UnicodeScalarView) throws -> Value {
-        let parser = JSONParser(data: data)
+    class func parse(scalars: String.UnicodeScalarView) throws -> Value {
+        let parser = JSONParser(scalars: scalars)
         return try parser.parse()
     }
-    
-    class func parse(_ string: String) throws -> Value {
-        let parser = JSONParser(data: string.unicodeScalars)
+
+    class func parse(string: String) throws -> Value {
+        let parser = JSONParser(scalars: string.unicodeScalars)
         return try parser.parse()
     }
-    
-    init(data: String.UnicodeScalarView) {
-        generator = data.makeIterator()
-        self.data = data
+
+    init(scalars: String.UnicodeScalarView) {
+        generator = scalars.makeIterator()
+        self.data = scalars
     }
 
     func parse() throws -> Value {
@@ -76,7 +74,7 @@ private class JSONParser {
     var charNumber: UInt = 0
 
     var crlfHack = false
-    
+
     func nextScalar() throws {
         if let sc = generator.next() {
             scalar = sc
@@ -113,7 +111,7 @@ private class JSONParser {
         }
     }
 
-    func nextScalars(_ count: UInt) throws -> [UnicodeScalar] {
+    func nextScalars(count: UInt) throws -> [UnicodeScalar] {
         var values = [UnicodeScalar]()
         values.reserveCapacity(Int(count))
         for _ in 0..<count {
@@ -254,13 +252,13 @@ private class JSONParser {
                 // Escape character
                 if escaping {
                     // Escaping the escape char
-                    strBuilder.append(String(describing: reverseSolidus))
+                    strBuilder.unicodeScalars.append(reverseSolidus)
                 }
                 escaping = !escaping
                 try nextScalar()
             case quotationMark:
                 if escaping {
-                    strBuilder.append(String(describing: quotationMark))
+                    strBuilder.unicodeScalars.append(quotationMark)
                     escaping = false
                     try nextScalar()
                 } else {
@@ -271,11 +269,14 @@ private class JSONParser {
                 if escaping {
                     // Handle all the different escape characters
                     if let s = escapeMap[scalar] {
-                        strBuilder.append(String(describing: s))
+                        strBuilder.unicodeScalars.append(s)
                         try nextScalar()
                     } else if scalar == "u".unicodeScalars.first! {
                         let escapedUnicodeValue = try nextUnicodeEscape()
-                        strBuilder.append(String(describing: UnicodeScalar(escapedUnicodeValue)))
+                        guard let escapedUnicodeScalar = UnicodeScalar(escapedUnicodeValue) else {
+                            throw Error.invalidUnicode
+                        }
+                        strBuilder.unicodeScalars.append(escapedUnicodeScalar)
                         try nextScalar()
                     }
                     escaping = false
@@ -314,6 +315,9 @@ private class JSONParser {
             }
         }
         if readScalar >= 0xD800 && readScalar <= 0xDBFF {
+            // UTF-16 surrogate pair
+            // The next character MUST be the other half of the surrogate pair
+            // Otherwise it's a unicode error
             do {
                 try nextScalar()
                 if scalar != reverseSolidus {
@@ -447,7 +451,7 @@ private class JSONParser {
                     number = Int64(integer)
                 }
             }
-            
+
             if number < Int64(Int.max) {
                 return Value.integer(Int(number))
             } else {
@@ -471,7 +475,7 @@ private class JSONParser {
             throw Error.unexpectedCharacter(lineNumber: lineNumber, characterNumber: charNumber)
         }
         do {
-            let word = try [scalar] + nextScalars(UInt(expectedWord.count - 1))
+            let word = try [scalar] + nextScalars(count: UInt(expectedWord.count - 1))
             if word != expectedWord {
                 throw Error.unexpectedKeyword(lineNumber: lineNumAtStart, characterNumber: charNumAtStart)
             }
@@ -482,7 +486,7 @@ private class JSONParser {
     }
 
     func nextNull() throws -> Value {
-        let word = try [scalar] + nextScalars(3)
+        let word = try [scalar] + nextScalars(count: 3)
         if word != nullToken {
             throw Error.unexpectedKeyword(lineNumber: lineNumber, characterNumber: charNumber-4)
         }
@@ -523,21 +527,21 @@ private let escapeMap = [
     "t".unicodeScalars.first!: tabCharacter
 ]
 
-private let hexScalars = [
-    "0".unicodeScalars.first!,
-    "1".unicodeScalars.first!,
-    "2".unicodeScalars.first!,
-    "3".unicodeScalars.first!,
-    "4".unicodeScalars.first!,
-    "5".unicodeScalars.first!,
-    "6".unicodeScalars.first!,
-    "7".unicodeScalars.first!,
-    "8".unicodeScalars.first!,
-    "9".unicodeScalars.first!,
-    "a".unicodeScalars.first!,
-    "b".unicodeScalars.first!,
-    "c".unicodeScalars.first!,
-    "d".unicodeScalars.first!,
-    "e".unicodeScalars.first!,
-    "f".unicodeScalars.first!
+private let hexStrings = [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f"
 ]

@@ -137,33 +137,41 @@ public extension Value {
 }
 
 public extension Value {
-    init(native value: Any?) {
+    static func from(native value: Any?) -> Value {
         switch value {
-        case nil: self = .null
-        case let bool as Bool: self = .boolean(bool)
-        case let int as Int: self = .integer(int)
+        case nil: return .null
+        case let bool as Bool: return .boolean(bool)
+        case let int as Int: return .integer(int)
         case let int64 as Int64:
-            if int64 < Int64(Int.max) { self = .integer(Int(int64)) }
-            else { self = .double(Double(int64)) }
+            if int64 < Int64(Int.max) { return .integer(Int(int64)) }
+            else { return .double(Double(int64)) }
         case let uint as UInt:
-            if uint < UInt(Int.max) { self = .integer(Int(uint)) }
-            else { self = .double(Double(uint)) }
+            if uint < UInt(Int.max) { return .integer(Int(uint)) }
+            else { return .double(Double(uint)) }
         case let uint64 as UInt64:
-            if uint64 < UInt64(Int.max) { self = .integer(Int(uint64)) }
-            else { self = .double(Double(uint64)) }
-        case let double as Double: self = .double(double)
-        case let float as Float: self = .double(Double(float))
-        case let string as String: self = .string(string)
-        case let character as Character: self = .string(String(character))
+            if uint64 < UInt64(Int.max) { return .integer(Int(uint64)) }
+            else { return .double(Double(uint64)) }
+        case let double as Double: return .double(double)
+        case let float as Float: return .double(Double(float))
+        case let string as String: return .string(string)
+        case let character as Character: return .string(String(character))
         default:
-            if let dictionary = castDictionary(value) {
-                self = .dictionary(dictionary.dictMap { ($0, Value(native: $1)) })
-            } else if let array = castArray(value) {
-                self = .array(array.map { Value(native: $0) })
+            if let (value, mirror) = deepUnwrap(value) {
+                if let dictionary = castDictionary(mirror) {
+                    return .dictionary(dictionary.dictMap { ($0, .from(native: $1)) })
+                } else if let array = castArray(mirror) {
+                    return .array(array.map { .from(native: $0) })
+                } else {
+                    return .other(value)
+                }
             } else {
-                self = .other(value)
+                return .null
             }
         }
+    }
+
+    init(native value: Any?) {
+        self = .from(native: value)
     }
 }
 
@@ -219,16 +227,26 @@ private extension Dictionary {
     }
 }
 
-private func castDictionary(_ any: Any) -> [String: Any]? {
+private func deepUnwrap(_ any: Any) -> (Any, Mirror)? {
     let mirror = Mirror(reflecting: any)
-    
-    guard let displayStyle = mirror.displayStyle, displayStyle == .dictionary else {
-        return nil
+
+    if mirror.displayStyle != .optional { return (any, mirror) }
+
+    if let child = mirror.children.first, child.label == "some" {
+        return deepUnwrap(child.value)
     }
-    
-    var dictionary = [String: Any]()
-    
-    for property in Array(mirror.children) {
+
+    return nil
+}
+
+private func castDictionary(_ mirror: Mirror) -> [String: Any]? {
+    guard mirror.displayStyle == .dictionary else { return nil }
+
+    let children = Array(mirror.children)
+
+    var dictionary = [String: Any](minimumCapacity: children.count)
+
+    for property in children {
         let pair = Array(Mirror(reflecting: property.value).children)
         
         if let key = pair[0].value as? String {
@@ -241,9 +259,7 @@ private func castDictionary(_ any: Any) -> [String: Any]? {
     return dictionary
 }
 
-private func castArray(_ any: Any) -> [Any]? {
-    let mirror = Mirror(reflecting: any)
-    
+private func castArray(_ mirror: Mirror) -> [Any]? {
     if let displayStyle = mirror.displayStyle, displayStyle == .collection || displayStyle == .set {
         return Array(mirror.children).map { $0.value }
     }

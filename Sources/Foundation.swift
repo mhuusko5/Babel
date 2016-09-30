@@ -8,42 +8,47 @@ public extension Value {
             throw DecodingError.invalidData(data: JSON)
         }
     }
-    
-    init(foundation value: Any?) {
+
+    static func from(foundation value: Any?) -> Value {
         switch value {
-        case nil: self = .null
-        case is NSNull: self = .null
-        case let string as NSString: self = .string(string as String)
-        case let dictionary as NSDictionary: 
-            var parsedDictionary: [String: Value] = [:]
-        
+        case nil: return .null
+        case is NSNull: return .null
+        case let string as NSString: return .string(string as String)
+        case let dictionary as NSDictionary:
+            var parsedDictionary = [String: Value](minimumCapacity: dictionary.count)
+
             for (key, value) in dictionary {
                 if let key = key as? String {
-                    parsedDictionary[key] = Value(foundation: value)
+                    parsedDictionary[key] = .from(foundation: value)
                 } else {
-                    self = .other(value)
-                    return
+                    return .other(dictionary)
                 }
             }
-            
-            self = .dictionary(parsedDictionary)
-        case let array as NSArray: self = .array(array.map { Value(foundation: $0) })
-        case let set as NSSet: self = .array(set.allObjects.map { Value(foundation: $0) })
-        case let decimal as NSDecimalNumber: self = .double(decimal.doubleValue)
+
+            return .dictionary(parsedDictionary)
+        case let array as NSArray: return .array(array.map { .from(foundation: $0) })
+        case let set as NSSet: return .array(set.allObjects.map { .from(foundation: $0) })
+        case let decimal as NSDecimalNumber: return .double(decimal.doubleValue)
         case let number as NSNumber:
+            if CFBooleanGetTypeID() == CFGetTypeID(number) { return .boolean(number.boolValue) }
+
             switch String(cString: number.objCType) {
             case "i", "l", "q":
                 if number.int64Value < Int64(Int.max) {
-                    self = .integer(number.intValue)
+                    return .integer(number.intValue)
                 } else {
-                    self = .double(number.doubleValue)
+                    return .double(number.doubleValue)
                 }
-            case "q", "d", "f": self = .double(number.doubleValue)
-            case "B", "c": self = .boolean(number.boolValue)
-            default: self = .other(value)
+            case "d", "f": return .double(number.doubleValue)
+            case "B", "c": return .boolean(number.boolValue)
+            default: return .from(native: value)
             }
-        default: self = .other(value)
+        default: return .from(native: value)
         }
+    }
+
+    init(foundation value: Any?) {
+        self = .from(foundation: value)
     }
 }
 
@@ -52,7 +57,7 @@ public extension Decodable {
         return try decode(Value(JSON: JSON))
     }
     
-    static func decode(foundation value: Any) throws -> Self {
+    static func decode(foundation value: Any?) throws -> Self {
         return try decode(Value(foundation: value))
     }
 }
