@@ -32,18 +32,20 @@ public extension Value {
         case let number as NSNumber:
             if CFBooleanGetTypeID() == CFGetTypeID(number) { return .boolean(number.boolValue) }
 
-            switch String(cString: number.objCType) {
-            case "i", "l", "q":
+            switch CFNumberGetType(number) {
+            case .intType, .sInt8Type, .sInt16Type, .sInt32Type, .sInt64Type,
+                 .nsIntegerType, .cfIndexType,
+                 .shortType, .longType, .longLongType:
                 if number.int64Value < Int64(Int.max) {
                     return .integer(number.intValue)
                 } else {
                     return .double(number.doubleValue)
                 }
-            case "d", "f": return .double(number.doubleValue)
-            case "B", "c": return .boolean(number.boolValue)
-            default: return .from(native: value)
+            case .floatType, .float32Type, .float64Type, .doubleType, .cgFloatType:
+                return .double(number.doubleValue)
+            case .charType: return .boolean(number.boolValue)
             }
-        default: return .from(native: value)
+        default: return .other(value)
         }
     }
 
