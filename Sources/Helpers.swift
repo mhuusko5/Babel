@@ -14,7 +14,7 @@ public func prettyDescription(_ any: Any) -> String {
     if any is Void {
         return "Void"
     }
-	
+
     if let int = any as? Int {
 		return String(int)
     } else if let uint = any as? UInt {
@@ -28,6 +28,10 @@ public func prettyDescription(_ any: Any) -> String {
     } else if let string = any as? String {
 		return "\"\(string)\""
 	}
+
+    if let any = any as? LosslessStringConvertible {
+        return any.description
+    }
     
     func indentedString(_ string: String) -> String {
         return string.characters

@@ -126,7 +126,7 @@ private class JSONParser {
         if v == 0x0009 || v == 0x000A || v == 0x000D || v == 0x0020 {
             try skipToNextToken()
         }
-        switch scalar {
+        switch scalar! {
         case leftCurlyBracket:
             return try nextObject()
         case leftSquareBracket:
@@ -184,7 +184,7 @@ private class JSONParser {
             guard case .string(let key) = string else { throw Error.unknown }
             //let key = string.string! // We're pretty confident it's a string since we called nextString() above
             dictBuilder[key] = value
-            switch scalar {
+            switch scalar! {
             case rightCurlyBracket:
                 break outerLoop
             case comma:
@@ -225,7 +225,7 @@ private class JSONParser {
             if v == 0x0009 || v == 0x000A || v == 0x000D || v == 0x0020 {
                 try skipToNextToken()
             }
-            switch scalar {
+            switch scalar! {
             case rightSquareBracket:
                 break outerLoop
             case comma:
@@ -247,7 +247,7 @@ private class JSONParser {
         var escaping = false
         outerLoop: repeat {
             // First we should deal with the escape character and the terminating quote
-            switch scalar {
+            switch scalar! {
             case reverseSolidus:
                 // Escape character
                 if escaping {
@@ -352,7 +352,7 @@ private class JSONParser {
 
         do {
             outerLoop: repeat {
-                switch scalar {
+                switch scalar! {
                 case "0".unicodeScalars.first!..."9".unicodeScalars.first!:
                     hasDigits = true
                     if hasDecimal {
@@ -385,7 +385,7 @@ private class JSONParser {
                         hasExponent = true
                     }
                     try nextScalar()
-                    switch scalar {
+                    switch scalar! {
                     case "0".unicodeScalars.first!..."9".unicodeScalars.first!:
                         positiveExponent = true
                     case plusScalar:

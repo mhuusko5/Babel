@@ -227,7 +227,9 @@ private extension Dictionary {
     }
 }
 
-private func deepUnwrap(_ any: Any) -> (Any, Mirror)? {
+private func deepUnwrap(_ any: Any?) -> (Any, Mirror)? {
+    guard let any = any else { return nil }
+
     let mirror = Mirror(reflecting: any)
 
     if mirror.displayStyle != .optional { return (any, mirror) }
@@ -251,6 +253,8 @@ private func castDictionary(_ mirror: Mirror) -> [String: Any]? {
         
         if let key = pair[0].value as? String {
             dictionary[key] = pair[1].value
+        } else if let index = pair[0].value as? Int {
+            dictionary[String(index)] = pair[1].value
         } else {
             return nil
         }

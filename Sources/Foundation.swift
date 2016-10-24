@@ -20,6 +20,8 @@ public extension Value {
             for (key, value) in dictionary {
                 if let key = key as? String {
                     parsedDictionary[key] = .from(foundation: value)
+                } else if let index = key as? Int {
+                    parsedDictionary[String(index)] = .from(foundation: value)
                 } else {
                     return .other(dictionary)
                 }
@@ -45,7 +47,7 @@ public extension Value {
                 return .double(number.doubleValue)
             case .charType: return .boolean(number.boolValue)
             }
-        default: return .other(value)
+        default: return .other(value!)
         }
     }
 

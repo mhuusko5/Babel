@@ -115,16 +115,16 @@ public extension Value {
     func asArray() throws -> [Value] {
         switch self {
         case let .array(array): return array
-        case let .other(other as Array<Value>): return other
-        default: throw DecodingError.typeMismatch(expectedType: Array<Value>.self, value: self)
+        case let .other(other as [Value]): return other
+        default: throw DecodingError.typeMismatch(expectedType: [Value].self, value: self)
         }
     }
     
     func asDictionary() throws -> [String: Value] {
         switch self {
         case let .dictionary(dictionary): return dictionary
-        case let .other(other as Dictionary<String, Value>): return other
-        default: throw DecodingError.typeMismatch(expectedType: Dictionary<String, Value>.self, value: self)
+        case let .other(other as [String: Value]): return other
+        default: throw DecodingError.typeMismatch(expectedType: [String: Value].self, value: self)
         }
     }
     

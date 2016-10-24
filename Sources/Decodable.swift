@@ -10,7 +10,7 @@ public protocol Decodable {
 public extension Decodable {
     static func decode(_ value: Value) throws -> Self {
         do {
-            if let value = value.otherValue as? Self {
+            if let value = value.nativeValue as? Self {
                 return value
             } else {
                 return try _decode(value)
@@ -63,7 +63,7 @@ public extension Collection where Iterator.Element == (key: String, value: Value
                 if let key = key as? K {
                     dictionary[key] = try V.decode(value)
                 } else {
-                    dictionary[try K.decode(.string(key))] = try V.decode(value)
+                    try dictionary[K.decode(.string(key))] = V.decode(value)
                 }
             } catch let error {
                 if !ignoreFailures { throw error }
