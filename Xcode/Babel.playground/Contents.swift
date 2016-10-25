@@ -111,7 +111,7 @@ public struct YouTubeResponse: Decodable {
         case .functionInferred:
             return try YouTubeResponse(
                 apiVersion: value.valueFor("apiVersion").decode(),
-                data: value.maybeValueFor("data")?.decode()
+                data: value.maybeValueFor("data", throwOnMissing: true)?.decode()
             )
             
         case .functionExplicit:
@@ -158,7 +158,7 @@ public struct YouTubeData: Decodable {
         case .functionInferred:
             return try YouTubeData(
                 totalItems: value.valueFor("totalItems").decode(),
-                firstItem: value.valueFor("items").maybeValueAt(0, throwOnMissing: false)?.decode(),
+                firstItem: value.valueFor("items").maybeValueAt(0)?.decode(),
                 items: value.valueFor("items").decode()
             )
             
@@ -279,12 +279,12 @@ do {
     
     switch decodingExample {
     case .operators:
-        content = (try value =>? "data" => "items" =>?? 0 => "content") ?? [:]
+        content = (try value =>? "data" => "items" =>?? 0 => "content" as [Int: URL]?) ?? [:]
         
     case .functionInferred:
-        content = (try value.maybeValueFor("data")?
+        content = (try value.maybeValueFor("data", throwOnMissing: true)?
                             .valueFor("items")
-                            .maybeValueAt(0, throwOnMissing: false)?
+                            .maybeValueAt(0)?
                             .valueFor("content").decode()) ?? [:]
         
     case .functionExplicit:

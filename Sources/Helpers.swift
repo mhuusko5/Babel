@@ -1,12 +1,12 @@
-public func prettyPrint(_ any: Any) {
+public func prettyPrint(_ any: Any?) {
     print(prettyDescription(any), terminator: "\n\n")
 }
 
-public func prettyPrint(_ prepend: String, _ any: Any) {
+public func prettyPrint(_ prepend: String, _ any: Any?) {
     print(prepend + prettyDescription(any), terminator: "\n\n")
 }
 
-public func prettyDescription(_ any: Any) -> String {
+public func prettyDescription(_ any: Any?) -> String {
     guard let (any, mirror) = deepUnwrap(any) else {
 		return "nil"
 	}
@@ -138,7 +138,9 @@ public func prettyDescription(_ any: Any) -> String {
     }
 }
 
-private func deepUnwrap(_ any: Any) -> (Any, Mirror)? {
+private func deepUnwrap(_ any: Any?) -> (Any, Mirror)? {
+    guard let any = any else { return nil }
+    
     let mirror = Mirror(reflecting: any)
 
     if mirror.displayStyle != .optional { return (any, mirror) }

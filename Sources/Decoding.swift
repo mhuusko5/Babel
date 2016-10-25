@@ -11,8 +11,17 @@ public extension _ArrayProtocol where Iterator.Element == Value {
         
         return self[index]
     }
-    
-    func maybeValueAt(_ index: Int, nilOnNull: Bool = true, throwOnMissing: Bool = true) throws -> Value? {
+
+    func maybeValueAt(_ index: Int, nilOnNull: Bool = true) -> Value? {
+        guard index < count else { return nil }
+
+        let value = self[index]
+
+        if nilOnNull && value == .null { return nil }
+        else { return value }
+    }
+
+    func maybeValueAt(_ index: Int, nilOnNull: Bool = true, throwOnMissing: Bool) throws -> Value? {
         guard index < count else {
             if throwOnMissing { throw DecodingError.outOfBounds(index: index, array: Array(self)) }
             else { return nil }
@@ -33,8 +42,17 @@ public extension Collection where Iterator.Element == (key: String, value: Value
         
         return value
     }
-    
-    func maybeValueFor(_ key: String, nilOnNull: Bool = true, throwOnMissing: Bool = true) throws -> Value? {
+
+    func maybeValueFor(_ key: String, nilOnNull: Bool = true) -> Value? {
+        let `self` = self as! [String: Value]
+
+        guard let value = self[key] else { return nil }
+
+        if nilOnNull && value == .null { return nil }
+        else { return value }
+    }
+
+    func maybeValueFor(_ key: String, nilOnNull: Bool = true, throwOnMissing: Bool) throws -> Value? {
         let `self` = self as! [String: Value]
         
         guard let value = self[key] else {
@@ -52,7 +70,7 @@ public extension Value {
         return try asArray().valueAt(index)
     }
     
-    func maybeValueAt(_ index: Int, nilOnNull: Bool = true, throwOnMissing: Bool = true) throws -> Value? {
+    func maybeValueAt(_ index: Int, nilOnNull: Bool = true, throwOnMissing: Bool = false) throws -> Value? {
         return try asArray().maybeValueAt(index, nilOnNull: nilOnNull, throwOnMissing: throwOnMissing)
     }
     
@@ -60,7 +78,7 @@ public extension Value {
         return try asDictionary().valueFor(key)
     }
     
-    func maybeValueFor(_ key: String, nilOnNull: Bool = true, throwOnMissing: Bool = true) throws -> Value? {
+    func maybeValueFor(_ key: String, nilOnNull: Bool = true, throwOnMissing: Bool = false) throws -> Value? {
         return try asDictionary().maybeValueFor(key, nilOnNull: nilOnNull, throwOnMissing: throwOnMissing)
     }
 }
