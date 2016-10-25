@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'Babel'
-  s.version = '0.5.4'
+  s.version = '0.5.5'
   s.summary = 'JSON! *Pure Swift*, failure driven, inferred *but unambiguous*, with powerful *but optional* operators.'
 
   s.license = { :type => 'MIT', :file => 'LICENSE' }
