@@ -5,7 +5,7 @@ public enum DecodingError: Error {
     case invalidData(data: Any)
 }
 
-public extension _ArrayProtocol where Iterator.Element == Value {
+public extension Array where Element == Value {
     func valueAt(_ index: Int) throws -> Value {
         guard index < count else { throw DecodingError.outOfBounds(index: index, array: Array(self)) }
         
@@ -34,18 +34,14 @@ public extension _ArrayProtocol where Iterator.Element == Value {
     }
 }
 
-public extension Collection where Iterator.Element == (key: String, value: Value) {
+public extension Dictionary where Key == String, Value == Babel.Value {
     func valueFor(_ key: String) throws -> Value {
-        let `self` = self as! [String: Value]
-        
         guard let value = self[key] else { throw DecodingError.missingKey(key: key, dictionary: self) }
         
         return value
     }
 
     func maybeValueFor(_ key: String, nilOnNull: Bool = true) -> Value? {
-        let `self` = self as! [String: Value]
-
         guard let value = self[key] else { return nil }
 
         if nilOnNull && value == .null { return nil }
@@ -53,8 +49,6 @@ public extension Collection where Iterator.Element == (key: String, value: Value
     }
 
     func maybeValueFor(_ key: String, nilOnNull: Bool = true, throwOnMissing: Bool) throws -> Value? {
-        let `self` = self as! [String: Value]
-        
         guard let value = self[key] else {
             if throwOnMissing { throw DecodingError.missingKey(key: key, dictionary: self) }
             else { return nil }

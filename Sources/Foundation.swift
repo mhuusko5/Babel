@@ -32,7 +32,7 @@ public extension Value {
         case let set as NSSet: return .array(set.allObjects.map { .from(foundation: $0) })
         case let decimal as NSDecimalNumber: return .double(decimal.doubleValue)
         case let number as NSNumber:
-            if CFBooleanGetTypeID() == CFGetTypeID(number) { return .boolean(number.boolValue) }
+            if CFGetTypeID(number) == CFBooleanGetTypeID() { return .boolean(number.boolValue) }
 
             switch CFNumberGetType(number) {
             case .intType, .sInt8Type, .sInt16Type, .sInt32Type, .sInt64Type,
@@ -101,9 +101,7 @@ extension Date: Decodable {
                 dateFormatter.timeZone = dateFormatTimezone
                 dateFormatter.locale = dateFormatLocale
                 
-                if let date = dateFormatter.date(from: dateString) {
-                    return self.init(timeIntervalSince1970: date.timeIntervalSince1970)
-                }
+                if let date = dateFormatter.date(from: dateString) { return date }
             }
             
             throw DecodingError.typeMismatch(expectedType: Date.self, value: value)

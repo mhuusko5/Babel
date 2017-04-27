@@ -33,7 +33,7 @@ public extension Decodable {
     }
 }
 
-public extension _ArrayProtocol where Iterator.Element == Value {
+public extension Array where Element == Value {
     func decode<T: Decodable>(type: T.Type = T.self, ignoreFailures: Bool = false) throws -> [T] {
         var array = [T]()
         
@@ -49,7 +49,7 @@ public extension _ArrayProtocol where Iterator.Element == Value {
     }
 }
 
-public extension Collection where Iterator.Element == (key: String, value: Value) {
+public extension Dictionary where Key == String, Value == Babel.Value {
     func decode<K: Decodable, V: Decodable>(
         keyType: K.Type = K.self,
         valueType: V.Type = V.self,
