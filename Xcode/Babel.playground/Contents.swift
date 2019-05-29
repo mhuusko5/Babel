@@ -117,7 +117,7 @@ public struct YouTubeResponse: Decodable {
         case .functionExplicit:
             return try YouTubeResponse(
                 apiVersion: value.asDictionary().valueFor("apiVersion").asDouble(),
-                data: value.asDictionary().maybeValueFor("data", nilOnNull: true, throwOnMissing: true)?.decode(type: YouTubeData.self, ignoreFailure: false)
+                data: value.asDictionary().maybeValueFor("data", nilOnNull: true, throwOnMissing: true)?.decode(type: YouTubeData.self)
             )
             
         case .unwrappingAndChecking:
@@ -165,7 +165,7 @@ public struct YouTubeData: Decodable {
         case .functionExplicit:
             return try YouTubeData(
                 totalItems: value.asDictionary().valueFor("totalItems").asInt(),
-                firstItem: value.asDictionary().valueFor("items").asArray().maybeValueAt(0, nilOnNull: true, throwOnMissing: false)?.decode(type: YouTubeDataItem.self, ignoreFailure: false),
+                firstItem: value.asDictionary().valueFor("items").asArray().maybeValueAt(0, nilOnNull: true, throwOnMissing: false)?.decode(type: YouTubeDataItem.self),
                 items: value.asDictionary().valueFor("items").asArray().decode(type: YouTubeDataItem.self, ignoreFailures: false)
             )
             

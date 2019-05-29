@@ -12,14 +12,6 @@ public func =><T: Decodable>(lhs: Value, rhs: Int) throws -> T {
     return try (lhs => rhs).decode()
 }
 
-public func =><T: Decodable>(lhs: Value, rhs: Int) throws -> [T] {
-    return try (lhs => rhs).decode()
-}
-
-public func =><K: Decodable, V: Decodable>(lhs: Value, rhs: Int) throws -> [K: V] {
-    return try (lhs => rhs).decode()
-}
-
 // MARK: Nil Chaining
 
 public func =>(lhs: Value?, rhs: Int) throws -> Value? {
@@ -27,14 +19,6 @@ public func =>(lhs: Value?, rhs: Int) throws -> Value? {
 }
 
 public func =><T: Decodable>(lhs: Value?, rhs: Int) throws -> T? {
-    return try (lhs => rhs)?.decode()
-}
-
-public func =><T: Decodable>(lhs: Value?, rhs: Int) throws -> [T]? {
-    return try (lhs => rhs)?.decode()
-}
-
-public func =><K: Decodable, V: Decodable>(lhs: Value?, rhs: Int) throws -> [K: V]? {
     return try (lhs => rhs)?.decode()
 }
 
@@ -48,14 +32,6 @@ public func =>?<T: Decodable>(lhs: Value, rhs: Int) throws -> T? {
     return try (lhs =>? rhs)?.decode()
 }
 
-public func =>?<T: Decodable>(lhs: Value, rhs: Int) throws -> [T]? {
-    return try (lhs =>? rhs)?.decode()
-}
-
-public func =>?<K: Decodable, V: Decodable>(lhs: Value, rhs: Int) throws -> [K: V]? {
-    return try (lhs =>? rhs)?.decode()
-}
-
 // MARK: Nil Chaining
 
 public func =>?(lhs: Value?, rhs: Int) throws -> Value? {
@@ -63,14 +39,6 @@ public func =>?(lhs: Value?, rhs: Int) throws -> Value? {
 }
 
 public func =>?<T: Decodable>(lhs: Value?, rhs: Int) throws -> T? {
-    return try (lhs =>? rhs)?.decode()
-}
-
-public func =>?<T: Decodable>(lhs: Value?, rhs: Int) throws -> [T]? {
-    return try (lhs =>? rhs)?.decode()
-}
-
-public func =>?<K: Decodable, V: Decodable>(lhs: Value?, rhs: Int) throws -> [K: V]? {
     return try (lhs =>? rhs)?.decode()
 }
 
@@ -84,14 +52,6 @@ public func =>??<T: Decodable>(lhs: Value, rhs: Int) throws -> T? {
     return try (lhs =>?? rhs)?.decode()
 }
 
-public func =>??<T: Decodable>(lhs: Value, rhs: Int) throws -> [T]? {
-    return try (lhs =>?? rhs)?.decode()
-}
-
-public func =>??<K: Decodable, V: Decodable>(lhs: Value, rhs: Int) throws -> [K: V]? {
-    return try (lhs =>?? rhs)?.decode()
-}
-
 // MARK: Nil Chaining
 
 public func =>??(lhs: Value?, rhs: Int) throws -> Value? {
@@ -99,14 +59,6 @@ public func =>??(lhs: Value?, rhs: Int) throws -> Value? {
 }
 
 public func =>??<T: Decodable>(lhs: Value?, rhs: Int) throws -> T? {
-    return try (lhs =>?? rhs)?.decode()
-}
-
-public func =>??<T: Decodable>(lhs: Value?, rhs: Int) throws -> [T]? {
-    return try (lhs =>?? rhs)?.decode()
-}
-
-public func =>??<K: Decodable, V: Decodable>(lhs: Value?, rhs: Int) throws -> [K: V]? {
     return try (lhs =>?? rhs)?.decode()
 }
 
@@ -120,14 +72,6 @@ public func =><T: Decodable>(lhs: Value, rhs: String) throws -> T {
     return try (lhs => rhs).decode()
 }
 
-public func =><T: Decodable>(lhs: Value, rhs: String) throws -> [T] {
-    return try (lhs => rhs).decode()
-}
-
-public func =><K: Decodable, V: Decodable>(lhs: Value, rhs: String) throws -> [K: V] {
-    return try (lhs => rhs).decode()
-}
-
 // MARK: Nil Chaining
 
 public func =>(lhs: Value?, rhs: String) throws -> Value? {
@@ -135,14 +79,6 @@ public func =>(lhs: Value?, rhs: String) throws -> Value? {
 }
 
 public func =><T: Decodable>(lhs: Value?, rhs: String) throws -> T? {
-    return try (lhs => rhs)?.decode()
-}
-
-public func =><T: Decodable>(lhs: Value?, rhs: String) throws -> [T]? {
-    return try (lhs => rhs)?.decode()
-}
-
-public func =><K: Decodable, V: Decodable>(lhs: Value?, rhs: String) throws -> [K: V]? {
     return try (lhs => rhs)?.decode()
 }
 
@@ -156,14 +92,6 @@ public func =>?<T: Decodable>(lhs: Value, rhs: String) throws -> T? {
     return try (lhs =>? rhs)?.decode()
 }
 
-public func =>?<T: Decodable>(lhs: Value, rhs: String) throws -> [T]? {
-    return try (lhs =>? rhs)?.decode()
-}
-
-public func =>?<K: Decodable, V: Decodable>(lhs: Value, rhs: String) throws -> [K: V]? {
-    return try (lhs =>? rhs)?.decode()
-}
-
 // MARK: Nil Chaining
 
 public func =>?(lhs: Value?, rhs: String) throws -> Value? {
@@ -171,14 +99,6 @@ public func =>?(lhs: Value?, rhs: String) throws -> Value? {
 }
 
 public func =>?<T: Decodable>(lhs: Value?, rhs: String) throws -> T? {
-    return try (lhs =>? rhs)?.decode()
-}
-
-public func =>?<T: Decodable>(lhs: Value?, rhs: String) throws -> [T]? {
-    return try (lhs =>? rhs)?.decode()
-}
-
-public func =>?<K: Decodable, V: Decodable>(lhs: Value?, rhs: String) throws -> [K: V]? {
     return try (lhs =>? rhs)?.decode()
 }
 
@@ -192,14 +112,6 @@ public func =>??<T: Decodable>(lhs: Value, rhs: String) throws -> T? {
     return try (lhs =>?? rhs)?.decode()
 }
 
-public func =>??<T: Decodable>(lhs: Value, rhs: String) throws -> [T]? {
-    return try (lhs =>?? rhs)?.decode()
-}
-
-public func =>??<K: Decodable, V: Decodable>(lhs: Value, rhs: String) throws -> [K: V]? {
-    return try (lhs =>?? rhs)?.decode()
-}
-
 // MARK: Nil Chaining
 
 public func =>??(lhs: Value?, rhs: String) throws -> Value? {
@@ -207,13 +119,5 @@ public func =>??(lhs: Value?, rhs: String) throws -> Value? {
 }
 
 public func =>??<T: Decodable>(lhs: Value?, rhs: String) throws -> T? {
-    return try (lhs =>?? rhs)?.decode()
-}
-
-public func =>??<T: Decodable>(lhs: Value?, rhs: String) throws -> [T]? {
-    return try (lhs =>?? rhs)?.decode()
-}
-
-public func =>??<K: Decodable, V: Decodable>(lhs: Value?, rhs: String) throws -> [K: V]? {
     return try (lhs =>?? rhs)?.decode()
 }

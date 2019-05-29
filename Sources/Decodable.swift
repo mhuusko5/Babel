@@ -79,26 +79,28 @@ public extension Value {
         return try T.decode(self)
     }
     
-    func decode<T: Decodable>(type: T.Type = T.self, ignoreFailure: Bool = false) throws -> T? {
-        do {
-            return try T.decode(self)
-        } catch let error {
-            if ignoreFailure { return nil }
-            else { throw error }
-        }
-    }
-    
     func decode<T: Decodable>(type: T.Type = T.self, ignoreFailures: Bool = false) throws -> [T] {
         return try asArray().decode(ignoreFailures: ignoreFailures)
     }
     
     func decode<K: Decodable, V: Decodable>(
-        keyType: K.Type = K.self,
-        valueType: V.Type = V.self,
+        keyType: K.Type = K.self, valueType: V.Type = V.self,
         ignoreFailures: Bool = false
     ) throws -> [K: V] {
 
         return try asDictionary().decode(ignoreFailures: ignoreFailures)
+    }
+}
+
+extension Array: Decodable where Element: Decodable {
+    public static func _decode(_ value: Value) throws -> Array {
+        return try value.asArray().decode()
+    }
+}
+
+extension Dictionary: Decodable where Key: Decodable, Value: Decodable {
+    public static func _decode(_ value: Babel.Value) throws -> Dictionary {
+        return try value.asDictionary().decode()
     }
 }
 
