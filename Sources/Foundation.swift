@@ -46,6 +46,7 @@ public extension Value {
             case .floatType, .float32Type, .float64Type, .doubleType, .cgFloatType:
                 return .double(number.doubleValue)
             case .charType: return .boolean(number.boolValue)
+            @unknown default: fatalError()
             }
         default: return .other(value!)
         }

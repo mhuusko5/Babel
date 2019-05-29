@@ -34,7 +34,7 @@ public func prettyDescription(_ any: Any?) -> String {
     }
     
     func indentedString(_ string: String) -> String {
-        return string.characters
+        return string
             .split(separator: "\r")
             .map(String.init)
             .map { $0.isEmpty ? "" : "\r    \($0)" }
@@ -59,7 +59,7 @@ public func prettyDescription(_ any: Any?) -> String {
         var string = "("
         
         for (index, property) in properties.enumerated() {
-            if property.label!.characters.first! == "." {
+            if property.label!.first! == "." {
                 string += prettyDescription(property.value)
             } else {
                 string += "\(property.label!): \(prettyDescription(property.value))"
@@ -103,7 +103,7 @@ public func prettyDescription(_ any: Any?) -> String {
         
         let associatedValueString = prettyDescription(properties.first!.value)
         
-        if associatedValueString.characters.first! == "(" {
+        if associatedValueString.first! == "(" {
             string += associatedValueString
         } else {
             string += "(\(associatedValueString))"
@@ -135,6 +135,7 @@ public func prettyDescription(_ any: Any?) -> String {
         
         return string + "\r}"
     case .optional: fatalError()
+    @unknown default: fatalError()
     }
 }
 

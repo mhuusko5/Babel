@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'Babel'
-  s.version = '0.6.0'
+  s.version = '0.8.0'
   s.summary = 'JSON! *Pure Swift*, failure driven, inferred *but unambiguous*, with powerful *but optional* operators.'
 
   s.license = { :type => 'MIT', :file => 'LICENSE' }
@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
   s.source = { :git => 'https://github.com/mhuusko5/Babel.git', :tag => s.version.to_s }
 
   s.platforms = { :osx => '10.9', :ios => '8.0', :tvos => '9.0', :watchos => '2.0' }
-  s.requires_arc = true
+  s.swift_version = '5.0'
 
   s.subspec 'Core' do |ss|
     ss.source_files = 'Sources/Value.swift', 'Sources/Decoding.swift', 'Sources/JSON.swift'

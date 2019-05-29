@@ -6,6 +6,3 @@
 *.xcsettings
 
 xcuserdata/
-
-Pods/
-Podfile.lock

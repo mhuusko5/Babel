@@ -201,7 +201,7 @@ public extension Value {
     }
     
     func asCharacter() throws -> Character {
-        if case let .string(string) = self, let character = string.characters.first, string.characters.count == 1 {
+        if case let .string(string) = self, let character = string.first, string.count == 1 {
             return character
         } else if case let .other(other) = self, other is Character {
             return other as! Character
